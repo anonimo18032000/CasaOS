@@ -183,7 +183,7 @@ Check_Arch() {
 "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS/releases/download/v0.4.15/linux-${TARGET_ARCH}-casaos-v0.4.15.tar.gz"
 "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-CLI/releases/download/v0.4.4-3-alpha1/linux-${TARGET_ARCH}-casaos-cli-v0.4.4-3-alpha1.tar.gz"
 "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-UI/releases/download/v0.4.20/linux-all-casaos-v0.4.20.tar.gz"
-"https://gdinformaticasdp.com.br/linux/casaos/script/linux-all-appstore-v0.4.5.tar.gz" 
+"https://github.com/anonimo18032000/linux-all-appstore/archive/refs/tags/linux-all-appstore-v0.4.5.tar.gz" 
     )
 }
 
