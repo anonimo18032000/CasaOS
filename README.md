@@ -9,8 +9,10 @@
         <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800x300.png">
     </picture>
     <br/>
+<p/>
 
-### Screenshot
+# CasaOS - Sua Nuvem Pessoal
+
 <p align="center">
     <!-- CasaOS Banner -->
     <picture>
