@@ -11,7 +11,7 @@
     <br/>
 <p/>
 
-# Screenshot
+# Screenshot Apps
 
 <p align="center">
     <!-- CasaOS Screenshot -->
