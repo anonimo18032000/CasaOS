@@ -14,7 +14,7 @@
 <p align="center">
     <!-- CasaOS Banner -->
     <picture>
-        <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800x300.png">
+        <img alt="CasaOS" src="https://raw.githubusercontent.com/anonimo18032000/CasaOS/refs/heads/main/Lista_de_Apps.png">
     </picture>
     <br/>
 <p/>
