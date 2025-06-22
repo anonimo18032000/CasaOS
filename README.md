@@ -31,17 +31,9 @@ wget -qO- https://get.casaos.io | sudo bash
 ```
 
 
-###Desinstalar CasaOS
+Desinstalar CasaOS
 
-
-v0.3.3 or newer
 
 ```sh
 casaos-uninstall
-```
-
-Before v0.3.3
-
-```sh
-curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash
 ```
