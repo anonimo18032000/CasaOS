@@ -27,7 +27,7 @@ Suporte Oficial
 Instale um sistema da lista acima e execute este comando:
 
 ```sh
-wget -qO- https://github.com/anonimo18032000/CasaOS/blob/main/casaos-install.sh | bash
+wget -qO- https://raw.githubusercontent.com/anonimo18032000/CasaOS/refs/heads/main/casaos-install.sh | bash
 ```
 
 
