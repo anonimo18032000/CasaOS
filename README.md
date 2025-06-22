@@ -11,10 +11,10 @@
     <br/>
 <p/>
 
-# CasaOS - Sua Nuvem Pessoal
+# Screenshot
 
 <p align="center">
-    <!-- CasaOS Banner -->
+    <!-- CasaOS Screenshot -->
     <picture>
         <img alt="CasaOS" src="https://raw.githubusercontent.com/anonimo18032000/CasaOS/refs/heads/main/Lista_de_Apps.png">
     </picture>
