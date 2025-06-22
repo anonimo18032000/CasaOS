@@ -19,6 +19,8 @@
         <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800x300.png">
     </picture>
     <br/>
+<p/>
+    
 ### Compatibilidade de hardware
 
 - amd64 / x86-64
