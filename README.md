@@ -13,28 +13,24 @@
     <i>Connect with the community, establish autonomy, reduce the cost of SaaS, and MAXIMIZE the potential for a personalized copilot.</i>
     <br/>
     <br/>
-    <!-- CasaOS Badges -->
-    <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">
-        <img alt="CasaOS Version" src="https://img.shields.io/github/v/release/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=CasaOS" />
+    <!-- Fork Badges (point at anonimo18032000/CasaOS, not upstream) -->
+    <a href="https://github.com/anonimo18032000/CasaOS/releases" target="_blank">
+        <img alt="Fork Version" src="https://img.shields.io/github/v/release/anonimo18032000/CasaOS?include_prereleases&color=162453&style=flat-square&label=Fork" />
     </a>
-    <a href="https://github.com/IceWhaleTech/CasaOS/blob/main/LICENSE" target="_blank">
-        <img alt="CasaOS License" src="https://img.shields.io/github/license/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=License" />
+    <a href="https://github.com/anonimo18032000/CasaOS/blob/main/LICENSE" target="_blank">
+        <img alt="CasaOS License" src="https://img.shields.io/github/license/anonimo18032000/CasaOS?color=162453&style=flat-square&label=License" />
     </a>
-    <a href="https://github.com/IceWhaleTech/CasaOS/pulls" target="_blank">
-        <img alt="CasaOS Pull Requests" src="https://img.shields.io/github/issues-pr/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=PRs" />
+    <a href="https://github.com/anonimo18032000/CasaOS/pulls" target="_blank">
+        <img alt="Fork Pull Requests" src="https://img.shields.io/github/issues-pr/anonimo18032000/CasaOS?color=162453&style=flat-square&label=PRs" />
     </a>
+    <a href="https://github.com/anonimo18032000/CasaOS/stargazers" target="_blank">
+        <img alt="Fork Stargazers" src="https://img.shields.io/github/stars/anonimo18032000/CasaOS?color=162453&style=flat-square&label=Stars" />
+    </a>
+    <br/>
+    <!-- Upstream project badges, for reference -->
     <a href="https://github.com/IceWhaleTech/CasaOS/issues" target="_blank">
-        <img alt="CasaOS Issues" src="https://img.shields.io/github/issues/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Issues" />
+        <img alt="Upstream Issues (issues are disabled on this fork; report upstream bugs there)" src="https://img.shields.io/github/issues/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Upstream%20Issues" />
     </a>
-    <a href="https://codecov.io/gh/IceWhaleTech/CasaOS" > 
-    <img src="https://codecov.io/gh/IceWhaleTech/CasaOS/branch/main/graph/badge.svg?token=l9uMKGlkxM"/> 
-    </a>
-    <a href="https://github.com/IceWhaleTech/CasaOS/stargazers" target="_blank">
-        <img alt="CasaOS Stargazers" src="https://img.shields.io/github/stars/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Stars" />
-    </a>
-    <!-- <a href="https://github.com/IceWhaleTech/CasaOS/releases" target="_blank">
-    <img alt="CasaOS Downloads" src="https://img.shields.io/github/downloads/IceWhaleTech/CasaOS/total?color=162453&style=flat-square" />
-    </a> -->
     <br/>
     <!-- CasaOS Community -->
     <a href="https://discord.gg/knqAbbBbeX" target="_blank">
@@ -62,7 +58,8 @@
     <!-- CasaOS Links -->
     <a href="https://www.casaos.io" target="_blank">Website</a> |
     <a href="http://demo.casaos.io" target="_blank">Demo</a> |
-    <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">GitHub</a>
+    <a href="https://github.com/anonimo18032000/CasaOS" target="_blank">This Fork</a> |
+    <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">Upstream GitHub</a>
     <br/>
     <br/>
     <!-- CasaOS Snapshots -->
@@ -154,9 +151,9 @@ Community Support
 - OpenWrt (🚧 Not Fully Tested Yet)
 - ArchLinux (🚧 Not Fully Tested Yet)
 
-### Quick Setup CasaOS
+### Quick Setup CasaOS (official upstream build)
 
-Freshly install a system from the list above and run this command:
+Freshly install a system from the list above and run this command to install the **original, unmodified** CasaOS from IceWhaleTech:
 
 ```sh
 wget -qO- https://get.casaos.io | sudo bash
@@ -168,7 +165,11 @@ or
 curl -fsSL https://get.casaos.io | sudo bash
 ```
 
+> If you want **this fork's** features (SFTP mounts, scheduled backups, storage health, HTTPS, etc.), use the command in [About This Fork](#about-this-fork) instead — do not mix the two on the same machine.
+
 ### Update CasaOS
+
+> ⚠️ **If you installed this fork**, do **not** use `Settings … Update` in the UI or the terminal commands below — they pull the **official upstream** release and will silently overwrite this fork's features with stock CasaOS. To update the fork, re-run this fork's install command (see [About This Fork](#about-this-fork)) once a newer fork release is published.
 
 CasaOS can be updated from the User Interface (UI), via `Settings ... Update`.  
 
@@ -209,6 +210,8 @@ curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash
 
 ## Community 
 
+> The section below describes the upstream CasaOS project and its community/team, not this fork.
+
 The word Casa comes from the Spanish word for "home". Project CasaOS originated as a pre-installed system for the crowdfunded product [ZimaBoard](https://www.zimaboard.com) on Kickstarter.
 
 After looking at many systems and software on the market, the team found no server system designed for home scenarios, sadly true.
@@ -230,6 +233,8 @@ CasaOS is a community-driven open source project and the people involved are Cas
 
 
 ## Credits
+
+> The list below credits contributors to the **upstream** CasaOS project. None of them are responsible for, or necessarily aware of, this fork's changes — see [About This Fork](#about-this-fork) for what was modified here.
 
 Many thanks to everyone who has helped CasaOS so far!
 
@@ -273,12 +278,4 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Changelog
 
-Detailed changes for each release are documented in the [release notes](https://github.com/IceWhaleTech/CasaOS/releases).
-
----
-
-<p align="center">
-    <a href="https://dashboard.trackgit.com/token/l5q8egi92tfhlxd70l2l">
-        <img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/l5q8egi92tfhlxd70l2l" alt="trackgit-views" />
-    </a>
-</p>
+Changes made in **this fork** are documented in its own [release notes](https://github.com/anonimo18032000/CasaOS/releases). For upstream CasaOS history, see the [official release notes](https://github.com/IceWhaleTech/CasaOS/releases).
