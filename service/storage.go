@@ -2,6 +2,7 @@ package service
 
 import (
 	"io/ioutil"
+	"strings"
 
 	"github.com/IceWhaleTech/CasaOS-Common/utils/logger"
 	"github.com/IceWhaleTech/CasaOS/pkg/utils/file"
@@ -14,11 +15,25 @@ type StorageService interface {
 	UnmountStorage(mountPoint string) error
 	GetStorages() (httper.MountList, error)
 	CreateConfig(data map[string]string, name string, t string) error
+	CreateConfigWithObscure(data map[string]string, name string, t string) error
+	UpdateConfig(name string, data map[string]string) error
+	TestConnection(fs string) error
 	CheckAndMountByName(name string) error
 	CheckAndMountAll() error
+	ReconnectStorage(mountPoint string) error
 	GetConfigByName(name string) (map[string]string, error)
 	DeleteConfigByName(name string) error
 	GetConfig() (httper.RemotesResult, error)
+}
+
+// remoteFs builds the "name:path" fs spec used to mount/remount a remote, honoring a custom
+// remote_path if one was stored in its config (e.g. sftp mounts pointed at a specific subfolder).
+// Remotes without a stored remote_path (dropbox/drive/onedrive) fall back to "name:" as before.
+func remoteFs(name string, cfg map[string]string) string {
+	if remotePath := cfg["remote_path"]; remotePath != "" {
+		return name + ":" + remotePath
+	}
+	return name + ":"
 }
 
 type storageStruct struct {
@@ -47,6 +62,15 @@ func (s *storageStruct) CreateConfig(data map[string]string, name string, t stri
 	httper.CreateConfig(data, name, t)
 	return nil
 }
+func (s *storageStruct) CreateConfigWithObscure(data map[string]string, name string, t string) error {
+	return httper.CreateConfigWithObscure(data, name, t)
+}
+func (s *storageStruct) UpdateConfig(name string, data map[string]string) error {
+	return httper.UpdateConfig(name, data)
+}
+func (s *storageStruct) TestConnection(fs string) error {
+	return httper.TestConnection(fs)
+}
 func (s *storageStruct) CheckAndMountByName(name string) error {
 	storages, _ := MyService.Storage().GetStorages()
 	currentRemote, _ := httper.GetConfigByName(name)
@@ -59,7 +83,7 @@ func (s *storageStruct) CheckAndMountByName(name string) error {
 		}
 	}
 	if !isMount {
-		return MyService.Storage().MountStorage(mountPoint, name+":")
+		return MyService.Storage().MountStorage(mountPoint, remoteFs(name, currentRemote))
 	}
 	return nil
 }
@@ -88,14 +112,28 @@ func (s *storageStruct) CheckAndMountAll() error {
 			}
 		}
 		if !isMount {
-			logger.Info("when CheckAndMountAll MountStorage", zap.String("mountPoint", mountPoint), zap.String("fs", v))
-			err := MyService.Storage().MountStorage(mountPoint, v+":")
+			fs := remoteFs(v, currentRemote)
+			logger.Info("when CheckAndMountAll MountStorage", zap.String("mountPoint", mountPoint), zap.String("fs", fs))
+			err := MyService.Storage().MountStorage(mountPoint, fs)
 			if err != nil {
 				logger.Error("when CheckAndMountAll then", zap.String("mountPoint", mountPoint), zap.String("fs", v), zap.Error(err))
 			}
 		}
 	}
 	return nil
+}
+
+// ReconnectStorage force-unmounts and remounts a storage, honoring its stored remote_path. Useful
+// when a mount has gone stale (e.g. the remote server dropped the connection) without CasaOS
+// noticing, since a plain "is it in the mount list" check doesn't catch that.
+func (s *storageStruct) ReconnectStorage(mountPoint string) error {
+	name := strings.TrimPrefix(mountPoint, "/mnt/")
+	cfg, err := httper.GetConfigByName(name)
+	if err != nil {
+		return err
+	}
+	_ = s.UnmountStorage(mountPoint)
+	return s.MountStorage(mountPoint, remoteFs(name, cfg))
 }
 
 func (s *storageStruct) GetConfigByName(name string) (map[string]string, error) {

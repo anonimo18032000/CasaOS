@@ -35,7 +35,7 @@ var (
 	CommonInfo = &model.CommonModel{
 		RuntimePath: constants.DefaultRuntimePath,
 	}
-	ServerInfo       = &model.ServerModel{}
+	ServerInfo       = &model.ServerModel{HardwareStatusIntervalMs: 5000}
 	SystemConfigInfo = &model.SystemConfig{}
 	FileSettingInfo  = &model.FileSetting{}
 

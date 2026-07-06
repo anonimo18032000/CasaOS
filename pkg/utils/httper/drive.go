@@ -61,6 +61,25 @@ func NewRestyClient() *resty.Client {
 	return client
 }
 
+// NewHealthCheckRestyClient is like NewRestyClient but with a short timeout and no retries, for
+// checks that need a fast yes/no (connection tests, health dashboards) rather than the patient
+// retry behaviour appropriate for an actual mount/create operation.
+func NewHealthCheckRestyClient() *resty.Client {
+	unixSocket := "/var/run/rclone/rclone.sock"
+
+	transport := http.Transport{
+		Dial: func(_, _ string) (net.Conn, error) {
+			return net.Dial("unix", unixSocket)
+		},
+	}
+
+	client := resty.New()
+
+	client.SetTransport(&transport).SetBaseURL("http://localhost")
+	client.SetRetryCount(0).SetTimeout(8 * time.Second).SetHeader("User-Agent", UserAgent)
+	return client
+}
+
 func GetMountList() (MountList, error) {
 	var result MountList
 	res, err := NewRestyClient().R().Post("/mount/listmounts")
@@ -129,6 +148,67 @@ func CreateConfig(data map[string]string, name, t string) error {
 	return nil
 }
 
+// CreateConfigWithObscure is like CreateConfig, but tells rclone to obscure fields such as `pass`
+// (rclone's own lightweight reversible encoding, not real encryption) before storing them - needed
+// for backends like sftp where the password/private key is passed in cleartext by the caller.
+func CreateConfigWithObscure(data map[string]string, name, t string) error {
+	data["config_is_local"] = "false"
+	dataStr, _ := json.Marshal(data)
+	res, err := NewRestyClient().R().SetFormData(map[string]string{
+		"name":       name,
+		"parameters": string(dataStr),
+		"type":       t,
+		"opt":        `{"obscure": true}`,
+	}).Post("/config/create")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		return fmt.Errorf("create config failed: %s", res.Body())
+	}
+
+	return nil
+}
+
+// TestConnection checks that fs (a remote, optionally with a path e.g. "name:/path") is reachable
+// and listable, without creating a mount. Used to validate credentials before committing to a mount.
+func TestConnection(fs string) error {
+	res, err := NewHealthCheckRestyClient().R().SetFormData(map[string]string{
+		"fs":     fs,
+		"remote": "",
+	}).Post("/operations/list")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		var result map[string]interface{}
+		_ = json.Unmarshal(res.Body(), &result)
+		if errMsg, ok := result["error"].(string); ok {
+			return fmt.Errorf("%s", errMsg)
+		}
+		return fmt.Errorf("connection test failed")
+	}
+	return nil
+}
+
+// UpdateConfig updates an existing remote's parameters in place (e.g. changing host/credentials),
+// obscuring password-like fields the same way CreateConfigWithObscure does.
+func UpdateConfig(name string, data map[string]string) error {
+	dataStr, _ := json.Marshal(data)
+	res, err := NewRestyClient().R().SetFormData(map[string]string{
+		"name":       name,
+		"parameters": string(dataStr),
+		"opt":        `{"obscure": true}`,
+	}).Post("/config/update")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		return fmt.Errorf("update config failed: %s", res.Body())
+	}
+	return nil
+}
+
 func GetConfigByName(name string) (map[string]string, error) {
 
 	res, err := NewRestyClient().R().SetFormData(map[string]string{
@@ -166,6 +246,43 @@ func DeleteConfigByName(name string) error {
 	}
 	if res.StatusCode() != 200 {
 		return fmt.Errorf("delete config failed")
+	}
+	return nil
+}
+
+// SyncCopy one-way copies everything from srcPath (a local filesystem path) to dstFs (an
+// "remote:path" fs spec), adding/updating files at the destination without deleting anything
+// there that isn't in the source - the safer choice for a backup job, as opposed to rclone's
+// `sync/sync` which mirrors exactly and would delete destination files removed from the source.
+// Backups can run long, so this uses its own client with a much longer timeout than the other
+// rclone RC calls (which are all interactive, user-facing requests).
+func SyncCopy(srcPath string, dstFs string) error {
+	unixSocket := "/var/run/rclone/rclone.sock"
+
+	transport := http.Transport{
+		Dial: func(_, _ string) (net.Conn, error) {
+			return net.Dial("unix", unixSocket)
+		},
+	}
+
+	client := resty.New()
+	client.SetTransport(&transport).SetBaseURL("http://localhost")
+	client.SetRetryCount(0).SetTimeout(4 * time.Hour).SetHeader("User-Agent", UserAgent)
+
+	res, err := client.R().SetFormData(map[string]string{
+		"srcFs": srcPath,
+		"dstFs": dstFs,
+	}).Post("/sync/copy")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		var result map[string]interface{}
+		_ = json.Unmarshal(res.Body(), &result)
+		if errMsg, ok := result["error"].(string); ok {
+			return fmt.Errorf("%s", errMsg)
+		}
+		return fmt.Errorf("backup copy failed")
 	}
 	return nil
 }

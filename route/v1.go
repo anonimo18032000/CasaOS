@@ -98,6 +98,8 @@ func InitV1Router() http.Handler {
 			v1SysGroup.GET("/proxy", v1.GetSystemProxy)
 			v1SysGroup.PUT("/state/:state", v1.PutSystemState)
 			v1SysGroup.GET("/entry", v1.GetSystemEntry)
+			v1SysGroup.GET("/hardware-status-interval", v1.GetHardwareStatusInterval)
+			v1SysGroup.PUT("/hardware-status-interval", v1.SetHardwareStatusInterval)
 		}
 		v1PortGroup := v1Group.Group("/port")
 		v1PortGroup.Use()
@@ -128,6 +130,20 @@ func InitV1Router() http.Handler {
 		{
 			v1CloudGroup.GET("", v1.ListStorages)
 			v1CloudGroup.DELETE("", v1.UmountStorage)
+			v1CloudGroup.POST("/sftp", v1.AddSFTPStorage)
+			v1CloudGroup.POST("/sftp/test", v1.TestSFTPStorage)
+			v1CloudGroup.PUT("/sftp", v1.EditSFTPStorage)
+			v1CloudGroup.GET("/health", v1.GetStoragesHealth)
+			v1CloudGroup.POST("/reconnect", v1.ReconnectStorage)
+		}
+		v1BackupGroup := v1Group.Group("/backup")
+		v1BackupGroup.Use()
+		{
+			v1BackupGroup.GET("", v1.ListBackupJobs)
+			v1BackupGroup.POST("", v1.CreateBackupJob)
+			v1BackupGroup.PUT("/:id", v1.EditBackupJob)
+			v1BackupGroup.DELETE("/:id", v1.DeleteBackupJob)
+			v1BackupGroup.POST("/:id/run", v1.RunBackupJobNow)
 		}
 		v1DriverGroup := v1Group.Group("/driver")
 		v1DriverGroup.Use()

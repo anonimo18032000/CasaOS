@@ -31,7 +31,7 @@ func SendAllHardwareStatusBySocket() {
 			if n.Name == netCardName {
 				item := *(*model.IOCountersStat)(unsafe.Pointer(&n))
 				item.State = strings.TrimSpace(service.MyService.System().GetNetState(n.Name))
-				item.Time = time.Now().Unix()
+				item.Time = time.Now().UnixMilli()
 				newNet = append(newNet, item)
 				break
 			}

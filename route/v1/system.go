@@ -230,7 +230,7 @@ func GetSystemUtilization(ctx echo.Context) error {
 			if n.Name == netCardName {
 				item := *(*model.IOCountersStat)(unsafe.Pointer(&n))
 				item.State = strings.TrimSpace(service.MyService.System().GetNetState(n.Name))
-				item.Time = time.Now().Unix()
+				item.Time = time.Now().UnixMilli()
 				newNet = append(newNet, item)
 				break
 			}
@@ -301,7 +301,7 @@ func GetSystemNetInfo(ctx echo.Context) error {
 			if n.Name == netCardName {
 				item := *(*model.IOCountersStat)(unsafe.Pointer(&n))
 				item.State = strings.TrimSpace(service.MyService.System().GetNetState(n.Name))
-				item.Time = time.Now().Unix()
+				item.Time = time.Now().UnixMilli()
 				newNet = append(newNet, item)
 				break
 			}
@@ -382,4 +382,41 @@ func GetSystemEntry(ctx echo.Context) error {
 		return ctx.JSON(http.StatusInternalServerError, model.Result{Success: common_err.SERVICE_ERROR, Message: entry, Data: json.RawMessage("[]")})
 	}
 	return ctx.JSON(http.StatusOK, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS), Data: str})
+}
+
+// GetHardwareStatusInterval returns how often (in milliseconds) CPU/memory/network stats are
+// pushed to the dashboard.
+func GetHardwareStatusInterval(ctx echo.Context) error {
+	return ctx.JSON(common_err.SUCCESS, model.Result{
+		Success: common_err.SUCCESS,
+		Message: common_err.GetMsg(common_err.SUCCESS),
+		Data:    map[string]int{"interval_ms": config.ServerInfo.HardwareStatusIntervalMs},
+	})
+}
+
+type SetHardwareStatusIntervalRequest struct {
+	IntervalMs int `json:"interval_ms"`
+}
+
+// SetHardwareStatusInterval changes and persists the dashboard refresh rate.
+func SetHardwareStatusInterval(ctx echo.Context) error {
+	var request SetHardwareStatusIntervalRequest
+	if err := ctx.Bind(&request); err != nil {
+		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{Success: common_err.CLIENT_ERROR, Message: err.Error()})
+	}
+	if request.IntervalMs <= 0 {
+		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{Success: common_err.CLIENT_ERROR, Message: "interval_ms must be positive"})
+	}
+
+	if err := service.RescheduleHardwareStatus(request.IntervalMs); err != nil {
+		return ctx.JSON(common_err.SERVICE_ERROR, model.Result{Success: common_err.SERVICE_ERROR, Message: err.Error()})
+	}
+
+	config.ServerInfo.HardwareStatusIntervalMs = request.IntervalMs
+	config.Cfg.Section("server").Key("HardwareStatusIntervalMs").SetValue(strconv.Itoa(request.IntervalMs))
+	if err := config.Cfg.SaveTo(config.ConfigFilePath); err != nil {
+		return ctx.JSON(common_err.SERVICE_ERROR, model.Result{Success: common_err.SERVICE_ERROR, Message: err.Error()})
+	}
+
+	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS)})
 }
