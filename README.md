@@ -75,6 +75,33 @@
     </kbd>
 </p>
 
+## About This Fork
+
+This is a modified fork of [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) maintained by [anonimo18032000](https://github.com/anonimo18032000). It adds several features and bug fixes on top of upstream CasaOS `v0.4.15`:
+
+- **SFTP remote storage**: connect/edit SFTP mounts from the UI (host, port, user/password or private key, custom display name, remote root folder), with a "test connection" button before mounting.
+- **Storage health panel**: status/latency for every network mount, plus a one-click reconnect.
+- **Scheduled backups**: create cron-based backup jobs that sync a local folder to any configured remote (SFTP/Dropbox/GDrive/OneDrive), with run-now, edit and delete.
+- **Opt-in automatic app updates**: hourly check that updates installed Compose apps when a new image is available.
+- **Configurable dashboard refresh rate**: choose the hardware-status polling interval (250ms/500ms/1s/2s/5s) instead of a fixed 5s.
+- **HTTPS support** (in [CasaOS-Gateway fork](https://github.com/anonimo18032000/CasaOS-Gateway)): self-signed certificate generation or custom certificate upload, with automatic HTTP → HTTPS redirect.
+- **Install feedback**: toast notifications on app install start/success/error instead of a silent background install.
+- Several bug fixes: SFTP key upload rejecting extensionless keys (`id_rsa`), a storage name-parsing bug that broke remounts with a custom remote path, a `robfig/cron` 1-second floor that silently ignored sub-second refresh rates, and a network-speed "NaN undefined/s" display bug at fast refresh rates.
+
+This fork also has companion forks for the other affected components: [CasaOS-UI](https://github.com/anonimo18032000/CasaOS-UI), [CasaOS-AppManagement](https://github.com/anonimo18032000/CasaOS-AppManagement) and [CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway). Every other component (MessageBus, UserService, LocalStorage, CLI, AppStore) is unmodified and comes straight from the official upstream releases.
+
+### Install this fork
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/anonimo18032000/CasaOS/main/install.sh | sudo bash
+```
+
+The installer works the same way as the official one-liner below, except it downloads CasaOS, CasaOS-UI, CasaOS-AppManagement and CasaOS-Gateway from this fork's [releases](https://github.com/anonimo18032000/CasaOS/releases) instead of upstream. Fork binaries were only built for **amd64**; on other architectures the script automatically falls back to the official upstream builds for those three components.
+
+> ⚠️ This is an unofficial, community-modified fork, not affiliated with or supported by IceWhaleTech. For the original project, see below.
+
+---
+
 ## Why do you need Personal Cloud?
 
 In 2020, the team noticed three important trends:
