@@ -638,8 +638,9 @@ DownloadAndInstallCasaOS() {
         done
 
         # Some release archives were packaged on Windows and may contain
-        # CRLF line endings, which break `bash` when running these scripts.
-        ${sudo_cmd} find "${TMP_DIR}" -name "*.sh" -exec sed -i 's/\r$//' {} \;
+        # CRLF line endings, which break `bash` when running these scripts,
+        # and break curl when a URL is read from a CRLF-terminated *.list file.
+        ${sudo_cmd} find "${TMP_DIR}" \( -name "*.sh" -o -name "*.list" \) -exec sed -i 's/\r$//' {} \;
 
         BUILD_DIR=$(${sudo_cmd} realpath -e "${TMP_DIR}"/build || Show 1 "Failed to find build directory")
 
