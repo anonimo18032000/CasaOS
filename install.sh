@@ -637,6 +637,10 @@ DownloadAndInstallCasaOS() {
             ColorReset
         done
 
+        # Some release archives were packaged on Windows and may contain
+        # CRLF line endings, which break `bash` when running these scripts.
+        ${sudo_cmd} find "${TMP_DIR}" -name "*.sh" -exec sed -i 's/\r$//' {} \;
+
         BUILD_DIR=$(${sudo_cmd} realpath -e "${TMP_DIR}"/build || Show 1 "Failed to find build directory")
 
         popd
