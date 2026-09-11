@@ -31,11 +31,6 @@
     <a href="https://github.com/IceWhaleTech/CasaOS/issues" target="_blank">
         <img alt="Upstream Issues (issues are disabled on this fork; report upstream bugs there)" src="https://img.shields.io/github/issues/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Upstream%20Issues" />
     </a>
-    <br/>
-    <!-- CasaOS Community -->
-    <a href="https://discord.gg/knqAbbBbeX" target="_blank">
-        <img alt="IceWhale Discord" src="https://img.shields.io/discord/884667213326463016?color=162453&style=flat-square&label=Discord&logo=discord&logoColor=fff" />
-    </a>
     <a href="https://github.com/IceWhaleTech/CasaOS/discussions" target="_blank">
         <img alt="CasaOS GitHub Discussions" src="https://img.shields.io/github/discussions/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Discussions&logo=github" />
     </a>
@@ -43,21 +38,8 @@
     <a href="#créditos">
         <img alt="All Contributors" src="https://img.shields.io/static/v1?label=All%20Contributors&message=15&color=162453&style=flat-square&logo=Handshake&logoColor=fff" />
     </a>
-    <!-- CasaOS YouTube -->
-    <a href="https://www.youtube.com/channel/UC2zMrUYT17AJhIl9XWZzT8g" target="_blank">
-        <img alt="YouTube Tutorial Views" src="https://img.shields.io/youtube/channel/views/UC2zMrUYT17AJhIl9XWZzT8g?style=flat-square&logo=youtube&logoColor=red&label=YouTube%20Tutorial%20Views" />
-    </a>
-    <br/>    
-    <a href="http://bit.ly/45JQIiL" target="_blank">
-        <img alt="twitter ZimaSpace" src="https://img.shields.io/twitter/follow/ZimaSpace?style=flat-square&logo=X&label=Contact%20Us%20%40%20ZimaSpace&labelColor=555&color=555" />
-    </a>
-    <a href="http://bit.ly/4lgHj7V" target="_blank">
-        <img alt="facebook ZimaSpace" src="https://img.shields.io/badge/ZimaSpace-1877F2?style=flat-square&logo=Facebook&logoColor=fff&label=Contact%20Us&labelColor=555&color=162453" />
-    </a>
     <br/>
     <!-- CasaOS Links -->
-    <a href="https://www.casaos.io" target="_blank">Site</a> |
-    <a href="http://demo.casaos.io" target="_blank">Demo</a> |
     <a href="https://github.com/anonimo18032000/CasaOS" target="_blank">Este Fork</a> |
     <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">GitHub Upstream</a>
     <br/>
@@ -214,7 +196,7 @@ curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash
 
 > A seção abaixo descreve o projeto CasaOS upstream e sua comunidade/equipe, não este fork.
 
-A palavra Casa vem do espanhol e significa "lar". O projeto CasaOS surgiu como um sistema pré-instalado no produto financiado via crowdfunding [ZimaBoard](https://www.zimaboard.com) no Kickstarter.
+A palavra Casa vem do espanhol e significa "lar". O projeto CasaOS surgiu como um sistema pré-instalado no produto financiado via crowdfunding ZimaBoard no Kickstarter.
 
 Depois de analisar muitos sistemas e softwares no mercado, a equipe constatou, infelizmente, que não havia nenhum sistema de servidor projetado para cenários domésticos.
 
@@ -222,17 +204,11 @@ Por isso, decidimos construir este projeto de código aberto para desenvolver o 
 
 Acreditamos que, por meio da inovação colaborativa impulsionada pela comunidade e da comunicação aberta com desenvolvedores do mundo todo, podemos transformar a experiência doméstica digital como nunca antes.
 
-**Você é muito bem-vindo para buscar ajuda ou compartilhar grandes ideias no nosso [Discord](https://discord.gg/knqAbbBbeX)!**
-
-[![Discord Card](https://discordapp.com/api/guilds/884667213326463016/widget.png?style=banner2)](https://discord.gg/knqAbbBbeX)
+**Você é muito bem-vindo para buscar ajuda ou compartilhar grandes ideias com a comunidade!**
 
 ## Contribuindo
 
 O CasaOS é um projeto de código aberto impulsionado pela comunidade, e as pessoas envolvidas são usuários do CasaOS. Isso significa que o CasaOS sempre vai precisar de contribuições de membros da comunidade como você!
-
-- Veja <https://wiki.casaos.io/en/contribute> para formas de contribuir com o CasaOS
-- Veja <https://wiki.casaos.io/en/contribute/development> se você quiser se envolver especificamente com contribuições de código
-
 
 ## Créditos
 
@@ -240,7 +216,7 @@ O CasaOS é um projeto de código aberto impulsionado pela comunidade, e as pess
 
 Muito obrigado a todos que ajudaram o CasaOS até agora!
 
-A contribuição de todos é muito apreciada. ([Legenda dos Emojis](https://allcontributors.org/docs/en/emoji-key))
+A contribuição de todos é muito apreciada.
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
