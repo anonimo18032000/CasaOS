@@ -37,6 +37,7 @@ type BackupService interface {
 	UpdateJob(job BackupJob) error
 	DeleteJob(id string) error
 	RunJob(id string) error
+	RunJobAsync(id string) error
 }
 
 func backupJobsFilePath() string {
@@ -48,6 +49,7 @@ type backupStruct struct {
 	jobs     []BackupJob
 	cronJob  *cron.Cron
 	entryIDs map[string]cron.EntryID
+	running  map[string]bool
 }
 
 // NewBackupService loads persisted backup jobs from disk and starts their cron schedules. Copies
@@ -57,6 +59,7 @@ func NewBackupService() BackupService {
 	s := &backupStruct{
 		cronJob:  cron.New(),
 		entryIDs: make(map[string]cron.EntryID),
+		running:  make(map[string]bool),
 	}
 	s.load()
 	s.cronJob.Start()
@@ -186,6 +189,9 @@ func (s *backupStruct) rescheduleAll() {
 	}
 }
 
+// RunJob runs a backup job synchronously (used by the cron scheduler, and internally by
+// RunJobAsync). Blocks for as long as the underlying copy takes - callers on a request/response
+// path should use RunJobAsync instead.
 func (s *backupStruct) RunJob(id string) error {
 	s.mu.Lock()
 	var job *BackupJob
@@ -199,9 +205,20 @@ func (s *backupStruct) RunJob(id string) error {
 		s.mu.Unlock()
 		return fmt.Errorf("backup job not found")
 	}
+	if s.running[id] {
+		s.mu.Unlock()
+		return fmt.Errorf("backup job is already running")
+	}
+	s.running[id] = true
 	sourcePath := job.SourcePath
 	dstFs := job.RemoteName + ":" + job.RemotePath
 	s.mu.Unlock()
+
+	defer func() {
+		s.mu.Lock()
+		delete(s.running, id)
+		s.mu.Unlock()
+	}()
 
 	logger.Info("running backup job", zap.String("id", id), zap.String("source", sourcePath), zap.String("dst", dstFs))
 	runErr := httper.SyncCopy(sourcePath, dstFs)
@@ -224,4 +241,36 @@ func (s *backupStruct) RunJob(id string) error {
 	s.mu.Unlock()
 
 	return runErr
+}
+
+// RunJobAsync starts a backup job in the background and returns immediately, instead of blocking
+// for however long the copy takes (up to hours for a large source) - the "run now" HTTP endpoint
+// uses this rather than RunJob, since a request/response cycle shouldn't hang open that long.
+// Callers should poll ListJobs for LastRun/LastStatus to see when it finishes. Returns an error
+// without starting anything if the job doesn't exist or is already running.
+func (s *backupStruct) RunJobAsync(id string) error {
+	s.mu.Lock()
+	found := false
+	for i := range s.jobs {
+		if s.jobs[i].ID == id {
+			found = true
+			break
+		}
+	}
+	alreadyRunning := s.running[id]
+	s.mu.Unlock()
+
+	if !found {
+		return fmt.Errorf("backup job not found")
+	}
+	if alreadyRunning {
+		return fmt.Errorf("backup job is already running")
+	}
+
+	go func() {
+		if err := s.RunJob(id); err != nil {
+			logger.Error("manual backup run failed", zap.String("job", id), zap.Error(err))
+		}
+	}()
+	return nil
 }

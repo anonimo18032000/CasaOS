@@ -91,15 +91,17 @@ func DeleteBackupJob(ctx echo.Context) error {
 	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS)})
 }
 
-// RunBackupJobNow triggers a backup job immediately, outside its schedule. Runs synchronously -
-// callers should expect this to take a while for large sources.
+// RunBackupJobNow triggers a backup job immediately, outside its schedule. Starts the job in the
+// background and returns right away - a large source can take hours to copy, and holding the HTTP
+// request open that long would just time out at the browser or a reverse proxy. Poll
+// ListBackupJobs for last_run/last_status to see the result.
 func RunBackupJobNow(ctx echo.Context) error {
 	id := ctx.Param("id")
 	if id == "" {
 		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{Success: common_err.CLIENT_ERROR, Message: "id is required"})
 	}
-	if err := service.MyService.Backup().RunJob(id); err != nil {
+	if err := service.MyService.Backup().RunJobAsync(id); err != nil {
 		return ctx.JSON(common_err.SERVICE_ERROR, model.Result{Success: common_err.SERVICE_ERROR, Message: err.Error()})
 	}
-	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS)})
+	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: "backup started"})
 }
