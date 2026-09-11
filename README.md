@@ -1,4 +1,4 @@
-# CasaOS - Your Personal Cloud 
+# CasaOS - Sua Nuvem Pessoal 
 <!-- Readme i18n links -->
 <!-- > English | [中文](#) | [Français](#) -->
 
@@ -10,7 +10,7 @@
         <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800x300.png">
     </picture>
     <br/>
-    <i>Connect with the community, establish autonomy, reduce the cost of SaaS, and MAXIMIZE the potential for a personalized copilot.</i>
+    <i>Conecte-se com a comunidade, estabeleça autonomia, reduza o custo de SaaS e MAXIMIZE o potencial de um copiloto personalizado.</i>
     <br/>
     <br/>
     <!-- Fork Badges (point at anonimo18032000/CasaOS, not upstream) -->
@@ -40,7 +40,7 @@
         <img alt="CasaOS GitHub Discussions" src="https://img.shields.io/github/discussions/IceWhaleTech/CasaOS?color=162453&style=flat-square&label=Discussions&logo=github" />
     </a>
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-    <a href="#credits">
+    <a href="#créditos">
         <img alt="All Contributors" src="https://img.shields.io/static/v1?label=All%20Contributors&message=15&color=162453&style=flat-square&logo=Handshake&logoColor=fff" />
     </a>
     <!-- CasaOS YouTube -->
@@ -56,10 +56,10 @@
     </a>
     <br/>
     <!-- CasaOS Links -->
-    <a href="https://www.casaos.io" target="_blank">Website</a> |
+    <a href="https://www.casaos.io" target="_blank">Site</a> |
     <a href="http://demo.casaos.io" target="_blank">Demo</a> |
-    <a href="https://github.com/anonimo18032000/CasaOS" target="_blank">This Fork</a> |
-    <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">Upstream GitHub</a>
+    <a href="https://github.com/anonimo18032000/CasaOS" target="_blank">Este Fork</a> |
+    <a href="https://github.com/IceWhaleTech/CasaOS" target="_blank">GitHub Upstream</a>
     <br/>
     <br/>
     <!-- CasaOS Snapshots -->
@@ -72,120 +72,120 @@
     </kbd>
 </p>
 
-## About This Fork
+## Sobre Este Fork
 
-This is a modified fork of [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) maintained by [anonimo18032000](https://github.com/anonimo18032000). It adds several features and bug fixes on top of upstream CasaOS `v0.4.15`:
+Este é um fork modificado do [IceWhaleTech/CasaOS](https://github.com/IceWhaleTech/CasaOS) mantido por [anonimo18032000](https://github.com/anonimo18032000). Ele adiciona várias funcionalidades e correções de bugs em cima do CasaOS upstream `v0.4.15`:
 
-- **SFTP remote storage**: connect/edit SFTP mounts from the UI (host, port, user/password or private key, custom display name, remote root folder), with a "test connection" button before mounting.
-- **Storage health panel**: status/latency for every network mount, plus a one-click reconnect.
-- **Scheduled backups**: create cron-based backup jobs that sync a local folder to any configured remote (SFTP/Dropbox/GDrive/OneDrive), with run-now, edit and delete.
-- **Opt-in automatic app updates**: hourly check that updates installed Compose apps when a new image is available.
-- **Configurable dashboard refresh rate**: choose the hardware-status polling interval (250ms/500ms/1s/2s/5s) instead of a fixed 5s.
-- **HTTPS support** (in [CasaOS-Gateway fork](https://github.com/anonimo18032000/CasaOS-Gateway)): self-signed certificate generation or custom certificate upload, with automatic HTTP → HTTPS redirect.
-- **Install feedback**: toast notifications on app install start/success/error instead of a silent background install.
-- Several bug fixes: SFTP key upload rejecting extensionless keys (`id_rsa`), a storage name-parsing bug that broke remounts with a custom remote path, a `robfig/cron` 1-second floor that silently ignored sub-second refresh rates, and a network-speed "NaN undefined/s" display bug at fast refresh rates.
+- **Armazenamento remoto SFTP**: conecte/edite montagens SFTP a partir da interface (host, porta, usuário/senha ou chave privada, nome de exibição personalizado, pasta raiz remota), com um botão de "testar conexão" antes de montar.
+- **Painel de saúde do armazenamento**: status/latência de cada montagem de rede, além de reconexão com um clique.
+- **Backups agendados**: crie tarefas de backup baseadas em cron que sincronizam uma pasta local com qualquer remoto configurado (SFTP/Dropbox/GDrive/OneDrive), com execução imediata, edição e exclusão.
+- **Atualizações automáticas de apps (opcionais)**: verificação a cada hora que atualiza os apps Compose instalados quando há uma nova imagem disponível.
+- **Taxa de atualização do painel configurável**: escolha o intervalo de consulta do status de hardware (250ms/500ms/1s/2s/5s) em vez de um valor fixo de 5s.
+- **Suporte a HTTPS** (no [fork do CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway)): geração de certificado autoassinado ou upload de certificado próprio, com redirecionamento automático de HTTP → HTTPS.
+- **Feedback de instalação**: notificações toast no início/sucesso/erro da instalação de apps, em vez de uma instalação silenciosa em segundo plano.
+- Diversas correções de bugs: upload de chave SFTP rejeitando chaves sem extensão (`id_rsa`), um bug de parsing do nome de armazenamento que quebrava remontagens com um caminho remoto customizado, um limite de 1 segundo do `robfig/cron` que ignorava silenciosamente taxas de atualização sub-segundo, e um bug de exibição "NaN undefined/s" na velocidade de rede em taxas de atualização rápidas.
 
-This fork also has companion forks for the other affected components: [CasaOS-UI](https://github.com/anonimo18032000/CasaOS-UI), [CasaOS-AppManagement](https://github.com/anonimo18032000/CasaOS-AppManagement) and [CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway). Every other component (MessageBus, UserService, LocalStorage, CLI, AppStore) is unmodified and comes straight from the official upstream releases.
+Este fork também tem forks complementares para os outros componentes afetados: [CasaOS-UI](https://github.com/anonimo18032000/CasaOS-UI), [CasaOS-AppManagement](https://github.com/anonimo18032000/CasaOS-AppManagement) e [CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway). Todos os demais componentes (MessageBus, UserService, LocalStorage, CLI, AppStore) não foram modificados e vêm direto das releases oficiais do upstream.
 
-### Install this fork
+### Instalar este fork
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/anonimo18032000/CasaOS/main/install.sh | sudo bash
 ```
 
-The installer works the same way as the official one-liner below, except it downloads CasaOS, CasaOS-UI, CasaOS-AppManagement and CasaOS-Gateway from this fork's [releases](https://github.com/anonimo18032000/CasaOS/releases) instead of upstream. Fork binaries were only built for **amd64**; on other architectures the script automatically falls back to the official upstream builds for those three components.
+O instalador funciona da mesma forma que o comando oficial abaixo, exceto que baixa o CasaOS, CasaOS-UI, CasaOS-AppManagement e CasaOS-Gateway das [releases](https://github.com/anonimo18032000/CasaOS/releases) deste fork em vez do upstream. Os binários do fork foram compilados apenas para **amd64**; em outras arquiteturas, o script automaticamente usa os builds oficiais do upstream para esses três componentes.
 
-> ⚠️ This is an unofficial, community-modified fork, not affiliated with or supported by IceWhaleTech. For the original project, see below.
+> ⚠️ Este é um fork não oficial, modificado pela comunidade, sem afiliação ou suporte da IceWhaleTech. Para o projeto original, veja abaixo.
 
 ---
 
-## Why do you need Personal Cloud?
+## Por que você precisa de uma Nuvem Pessoal?
 
-In 2020, the team noticed three important trends:
-- The cost of computing power and storage was decreasing fast.
-- A part of cloud computing was moving towards edge computing.
-- The issue of consumer data asset ownership and attribution had been ignored.
+Em 2020, a equipe notou três tendências importantes:
+- O custo de poder computacional e armazenamento estava caindo rapidamente.
+- Uma parte da computação em nuvem estava migrando para a computação de borda (edge computing).
+- A questão da propriedade e atribuição dos ativos de dados dos consumidores vinha sendo ignorada.
 
-Based on these trends, the team proposed a thought experiment internally: what if personal clouds were available under $100 in next five years? This personal cloud would provide a low-cost data collaboration solution as a personal data center, storing and managing data for creators and small organizations. A distributed collaborative computing network can be formed by personal servers located around the world. It could also control and connect all smart devices, providing cross-ecosystem local intelligent services.
+Com base nessas tendências, a equipe propôs internamente um experimento mental: e se nuvens pessoais estivessem disponíveis por menos de US$ 100 nos próximos cinco anos? Essa nuvem pessoal forneceria uma solução de colaboração de dados de baixo custo, funcionando como um data center pessoal, armazenando e gerenciando dados para criadores e pequenas organizações. Uma rede de computação colaborativa distribuída poderia ser formada por servidores pessoais localizados em todo o mundo. Ela também poderia controlar e conectar todos os dispositivos inteligentes, fornecendo serviços inteligentes locais entre ecossistemas.
 
-Furthermore, the personal cloud could combine personal data to train personalized AI assistants. The idea is that this technology would be an effective way to solve the issue of consumer data asset ownership and , as well as provide a more affordable and efficient computing solution for individuals and small organizations.
+Além disso, a nuvem pessoal poderia combinar dados pessoais para treinar assistentes de IA personalizados. A ideia é que essa tecnologia seria uma forma eficaz de resolver a questão da propriedade dos ativos de dados dos consumidores, além de fornecer uma solução de computação mais acessível e eficiente para indivíduos e pequenas organizações.
 
-> If you think what we are doing is valuable. Please **give us a star ⭐** and **fork it 🤞**!
+> Se você acha que o que estamos fazendo é valioso, por favor **nos dê uma estrela ⭐** e **faça um fork 🤞**!
 
-## Features
+## Funcionalidades
 
-- Friendly UI designed for home scenarios
-  - No code, no forms, intuitive, design for humanity
-- Multiple hardware and base system support
-  - ZimaBoard, NUC, RPi, old computers, whatever is available.
-- Selected apps in the app store, one-click installation
-  - Nextcloud, HomeAssistant, AdGuard, Jellyfin, *arr and more!
-- Easily install numerous Docker apps
-  - Over 100,000 apps from the Docker ecosystem can be easily installed
-- Elegant drive and file management
-  - What you see is what you get. No technical background required.
-- Well-designed system/app widgets
-  - What you care about, at a glance. Resource usage, app status, and more!
+- Interface amigável projetada para cenários domésticos
+  - Sem código, sem formulários, intuitiva, projetada para humanos
+- Suporte a múltiplos hardwares e sistemas base
+  - ZimaBoard, NUC, RPi, computadores antigos, o que estiver disponível.
+- Apps selecionados na loja de aplicativos, instalação com um clique
+  - Nextcloud, HomeAssistant, AdGuard, Jellyfin, *arr e muito mais!
+- Instale facilmente inúmeros apps Docker
+  - Mais de 100.000 apps do ecossistema Docker podem ser instalados facilmente
+- Gerenciamento elegante de discos e arquivos
+  - O que você vê é o que você tem. Nenhum conhecimento técnico necessário.
+- Widgets de sistema/apps bem projetados
+  - O que importa para você, em um piscar de olhos. Uso de recursos, status dos apps e muito mais!
 
-## Getting Started
+## Primeiros Passos
 
-CasaOS fully supports ZimaBoard, Intel NUC, and Raspberry Pi. Also, more computers and development boards and fully compatible with Ubuntu, Debian, Raspberry Pi OS, and CentOS with one-liner installation.
+O CasaOS suporta totalmente ZimaBoard, Intel NUC e Raspberry Pi. Além disso, é totalmente compatível com outros computadores e placas de desenvolvimento, com Ubuntu, Debian, Raspberry Pi OS e CentOS, através de instalação com um único comando.
 
-### Hardware Compatibility
+### Compatibilidade de Hardware
 
 - amd64 / x86-64
 - arm64
 - armv7
 
-### System Compatibility
+### Compatibilidade de Sistema
 
-Official Support
-- Debian 12 (✅ Tested, Recommended)
-- Ubuntu Server 20.04 (✅ Tested)
-- Raspberry Pi OS (✅ Tested)
+Suporte Oficial
+- Debian 12 (✅ Testado, Recomendado)
+- Ubuntu Server 20.04 (✅ Testado)
+- Raspberry Pi OS (✅ Testado)
 
-Community Support
-- Elementary 6.1 (✅ Tested)
-- Armbian 22.04 (✅ Tested)
-- Alpine (🚧 Not Fully Tested Yet)
-- OpenWrt (🚧 Not Fully Tested Yet)
-- ArchLinux (🚧 Not Fully Tested Yet)
+Suporte da Comunidade
+- Elementary 6.1 (✅ Testado)
+- Armbian 22.04 (✅ Testado)
+- Alpine (🚧 Ainda não testado completamente)
+- OpenWrt (🚧 Ainda não testado completamente)
+- ArchLinux (🚧 Ainda não testado completamente)
 
-### Quick Setup CasaOS (official upstream build)
+### Instalação Rápida do CasaOS (build oficial upstream)
 
-Freshly install a system from the list above and run this command to install the **original, unmodified** CasaOS from IceWhaleTech:
+Instale um sistema novo a partir da lista acima e execute este comando para instalar o CasaOS **original, sem modificações**, da IceWhaleTech:
 
 ```sh
 wget -qO- https://get.casaos.io | sudo bash
 ```
 
-or
+ou
 
 ```sh
 curl -fsSL https://get.casaos.io | sudo bash
 ```
 
-> If you want **this fork's** features (SFTP mounts, scheduled backups, storage health, HTTPS, etc.), use the command in [About This Fork](#about-this-fork) instead — do not mix the two on the same machine.
+> Se você quiser as funcionalidades **deste fork** (montagens SFTP, backups agendados, saúde do armazenamento, HTTPS, etc.), use o comando em [Sobre Este Fork](#sobre-este-fork) em vez deste — não misture os dois na mesma máquina.
 
-### Update CasaOS
+### Atualizar o CasaOS
 
-> ⚠️ **If you installed this fork**, do **not** use `Settings … Update` in the UI or the terminal commands below — they pull the **official upstream** release and will silently overwrite this fork's features with stock CasaOS. To update the fork, re-run this fork's install command (see [About This Fork](#about-this-fork)) once a newer fork release is published.
+> ⚠️ **Se você instalou este fork**, **não** use `Configurações ... Atualizar` na interface nem os comandos de terminal abaixo — eles baixam a release **oficial do upstream** e vão sobrescrever silenciosamente as funcionalidades deste fork com o CasaOS padrão. Para atualizar o fork, execute novamente o comando de instalação deste fork (veja [Sobre Este Fork](#sobre-este-fork)) quando uma nova release do fork for publicada.
 
-CasaOS can be updated from the User Interface (UI), via `Settings ... Update`.  
+O CasaOS pode ser atualizado a partir da Interface do Usuário (UI), em `Configurações ... Atualizar`.  
 
-Alternatively it can be updated from a terminal session.  To update from a terminal session, it must be done either from a secure shell (ssh) session to the device or from a directly attached terminal and keyboard to the device running CasaOS, this cannot be done from the terminal via the CasaOS User Interface (UI).  To update to the latest release of CasaOS from a terminal session run this command:
+Alternativamente, ele pode ser atualizado a partir de uma sessão de terminal. Para atualizar por uma sessão de terminal, isso deve ser feito por uma sessão segura (ssh) até o dispositivo ou por um terminal e teclado conectados diretamente ao dispositivo que executa o CasaOS — isso não pode ser feito pelo terminal embutido na Interface do Usuário (UI) do CasaOS. Para atualizar para a versão mais recente do CasaOS a partir de uma sessão de terminal, execute este comando:
 
 ```sh
 wget -qO- https://get.casaos.io/update | sudo bash
 ```
 
-or
+ou
 
 ```sh
 curl -fsSL https://get.casaos.io/update | sudo bash
 ```
 
-To determine version of CasaOS from a terminal session run this command:
+Para verificar a versão do CasaOS a partir de uma sessão de terminal, execute este comando:
 
 ```sh
 casaos -v
@@ -193,52 +193,52 @@ casaos -v
 
 
 
-### Uninstall CasaOS
+### Desinstalar o CasaOS
 
 
-v0.3.3 or newer
+v0.3.3 ou mais recente
 
 ```sh
 casaos-uninstall
 ```
 
-Before v0.3.3
+Antes da v0.3.3
 
 ```sh
 curl -fsSL https://get.icewhale.io/casaos-uninstall.sh | sudo bash
 ```
 
-## Community 
+## Comunidade 
 
-> The section below describes the upstream CasaOS project and its community/team, not this fork.
+> A seção abaixo descreve o projeto CasaOS upstream e sua comunidade/equipe, não este fork.
 
-The word Casa comes from the Spanish word for "home". Project CasaOS originated as a pre-installed system for the crowdfunded product [ZimaBoard](https://www.zimaboard.com) on Kickstarter.
+A palavra Casa vem do espanhol e significa "lar". O projeto CasaOS surgiu como um sistema pré-instalado no produto financiado via crowdfunding [ZimaBoard](https://www.zimaboard.com) no Kickstarter.
 
-After looking at many systems and software on the market, the team found no server system designed for home scenarios, sadly true.
+Depois de analisar muitos sistemas e softwares no mercado, a equipe constatou, infelizmente, que não havia nenhum sistema de servidor projetado para cenários domésticos.
 
-So, we set out to build this open-source project to develop CasaOS with our own hands, everyone in the community, and you.
+Por isso, decidimos construir este projeto de código aberto para desenvolver o CasaOS com nossas próprias mãos — todos na comunidade, e você também.
 
-We believe that through community-driven collaborative innovation and open communication with global developers, we can reshape the digital home experience like never before.
+Acreditamos que, por meio da inovação colaborativa impulsionada pela comunidade e da comunicação aberta com desenvolvedores do mundo todo, podemos transformar a experiência doméstica digital como nunca antes.
 
-**A warm welcome for you to get help or share great ideas in the [Discord](https://discord.gg/knqAbbBbeX)!**
+**Você é muito bem-vindo para buscar ajuda ou compartilhar grandes ideias no nosso [Discord](https://discord.gg/knqAbbBbeX)!**
 
 [![Discord Card](https://discordapp.com/api/guilds/884667213326463016/widget.png?style=banner2)](https://discord.gg/knqAbbBbeX)
 
-## Contributing
+## Contribuindo
 
-CasaOS is a community-driven open source project and the people involved are CasaOS users. That means CasaOS will always need contributions from community members just like you!
+O CasaOS é um projeto de código aberto impulsionado pela comunidade, e as pessoas envolvidas são usuários do CasaOS. Isso significa que o CasaOS sempre vai precisar de contribuições de membros da comunidade como você!
 
-- See <https://wiki.casaos.io/en/contribute> for ways of contributing to CasaOS
-- See <https://wiki.casaos.io/en/contribute/development> if you want to be involved in code contribution specifically
+- Veja <https://wiki.casaos.io/en/contribute> para formas de contribuir com o CasaOS
+- Veja <https://wiki.casaos.io/en/contribute/development> se você quiser se envolver especificamente com contribuições de código
 
 
-## Credits
+## Créditos
 
-> The list below credits contributors to the **upstream** CasaOS project. None of them are responsible for, or necessarily aware of, this fork's changes — see [About This Fork](#about-this-fork) for what was modified here.
+> A lista abaixo credita os contribuidores do projeto CasaOS **upstream**. Nenhum deles é responsável, ou necessariamente tem conhecimento, das alterações deste fork — veja [Sobre Este Fork](#sobre-este-fork) para saber o que foi modificado aqui.
 
-Many thanks to everyone who has helped CasaOS so far!
+Muito obrigado a todos que ajudaram o CasaOS até agora!
 
-Everyone's contribution is greatly appreciated. ([Emoji Key](https://allcontributors.org/docs/en/emoji-key))
+A contribuição de todos é muito apreciada. ([Legenda dos Emojis](https://allcontributors.org/docs/en/emoji-key))
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -274,8 +274,8 @@ Everyone's contribution is greatly appreciated. ([Emoji Key](https://allcontribu
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
+Este projeto segue a especificação [all-contributors](https://github.com/all-contributors/all-contributors). Contribuições de qualquer tipo são bem-vindas!
 
 ## Changelog
 
-Changes made in **this fork** are documented in its own [release notes](https://github.com/anonimo18032000/CasaOS/releases). For upstream CasaOS history, see the [official release notes](https://github.com/IceWhaleTech/CasaOS/releases).
+As alterações feitas **neste fork** estão documentadas em suas próprias [notas de versão](https://github.com/anonimo18032000/CasaOS/releases). Para o histórico do CasaOS upstream, veja as [notas de versão oficiais](https://github.com/IceWhaleTech/CasaOS/releases).
