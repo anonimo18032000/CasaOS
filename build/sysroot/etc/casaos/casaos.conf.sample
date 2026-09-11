@@ -19,5 +19,8 @@ Handshake = socket.casaos.io
 Token =
 USBAutoMount =
 HardwareStatusIntervalMs = 5000
+; Leave empty to use this fork's own installer as the update source (see service/system.go);
+; set explicitly only if you want "Settings ... Update" to pull from somewhere else instead.
+UpdateUrl =
 
 [system]

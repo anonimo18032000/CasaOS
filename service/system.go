@@ -381,8 +381,11 @@ func (s *systemService) UpdateSystemVersion(version string) {
 	if len(config.ServerInfo.UpdateUrl) > 0 {
 		go command.OnlyExec("curl -fsSL " + config.ServerInfo.UpdateUrl + " | bash")
 	} else {
-		osRelease, _ := file.ReadOSRelease()
-		go command.OnlyExec("curl -fsSL https://get.casaos.io/update?t=" + osRelease["MANUFACTURER"] + " | bash")
+		// Upstream falls back to https://get.casaos.io/update here, which would silently replace
+		// this fork's binaries with stock CasaOS the moment anyone clicks "Update" in Settings
+		// without having UpdateUrl set. Defaulting to this fork's own installer instead keeps that
+		// button (and any config predating this fix) safe without requiring a manual conf edit.
+		go command.OnlyExec("curl -fsSL https://raw.githubusercontent.com/anonimo18032000/CasaOS/main/install.sh | bash")
 	}
 
 	// s.log.Error(config.AppInfo.ProjectPath + "/shell/tool.sh -r " + version)

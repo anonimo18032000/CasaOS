@@ -83,6 +83,7 @@ Este é um fork modificado do [IceWhaleTech/CasaOS](https://github.com/IceWhaleT
 - **Taxa de atualização do painel configurável**: escolha o intervalo de consulta do status de hardware (250ms/500ms/1s/2s/5s) em vez de um valor fixo de 5s.
 - **Suporte a HTTPS** (no [fork do CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway)): geração de certificado autoassinado ou upload de certificado próprio, com redirecionamento automático de HTTP → HTTPS.
 - **Feedback de instalação**: notificações toast no início/sucesso/erro da instalação de apps, em vez de uma instalação silenciosa em segundo plano.
+- **Atualização segura**: o botão `Configurações ... Atualizar` (e o `UpdateUrl` vazio que ele usava) agora aponta por padrão para o instalador deste fork em vez de `get.casaos.io`, então clicar em Atualizar não sobrescreve mais silenciosamente as funcionalidades do fork com o CasaOS oficial.
 - Diversas correções de bugs: upload de chave SFTP rejeitando chaves sem extensão (`id_rsa`), um bug de parsing do nome de armazenamento que quebrava remontagens com um caminho remoto customizado, um limite de 1 segundo do `robfig/cron` que ignorava silenciosamente taxas de atualização sub-segundo, e um bug de exibição "NaN undefined/s" na velocidade de rede em taxas de atualização rápidas.
 
 Este fork também tem forks complementares para os outros componentes afetados: [CasaOS-UI](https://github.com/anonimo18032000/CasaOS-UI), [CasaOS-AppManagement](https://github.com/anonimo18032000/CasaOS-AppManagement) e [CasaOS-Gateway](https://github.com/anonimo18032000/CasaOS-Gateway). Todos os demais componentes (MessageBus, UserService, LocalStorage, CLI, AppStore) não foram modificados e vêm direto das releases oficiais do upstream.
@@ -169,7 +170,7 @@ curl -fsSL https://get.casaos.io | sudo bash
 
 ### Atualizar o CasaOS
 
-> ⚠️ **Se você instalou este fork**, **não** use `Configurações ... Atualizar` na interface nem os comandos de terminal abaixo — eles baixam a release **oficial do upstream** e vão sobrescrever silenciosamente as funcionalidades deste fork com o CasaOS padrão. Para atualizar o fork, execute novamente o comando de instalação deste fork (veja [Sobre Este Fork](#sobre-este-fork)) quando uma nova release do fork for publicada.
+> Se você instalou **este fork**, o botão `Configurações ... Atualizar` da interface já é seguro: por padrão, ele reexecuta o instalador **deste fork** (não o do upstream) — veja `UpdateUrl` em `service/system.go` e no `casaos.conf.sample`. Os comandos de terminal abaixo (`get.casaos.io/update`) continuam sendo os do **CasaOS oficial**; para atualizar o fork pelo terminal, execute de novo o comando de instalação deste fork (veja [Sobre Este Fork](#sobre-este-fork)) em vez dos comandos abaixo.
 
 O CasaOS pode ser atualizado a partir da Interface do Usuário (UI), em `Configurações ... Atualizar`.  
 
