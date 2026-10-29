@@ -404,8 +404,11 @@ func SetHardwareStatusInterval(ctx echo.Context) error {
 	if err := ctx.Bind(&request); err != nil {
 		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{Success: common_err.CLIENT_ERROR, Message: err.Error()})
 	}
-	if request.IntervalMs <= 0 {
-		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{Success: common_err.CLIENT_ERROR, Message: "interval_ms must be positive"})
+	if request.IntervalMs < service.MinHardwareStatusIntervalMs || request.IntervalMs > service.MaxHardwareStatusIntervalMs {
+		return ctx.JSON(common_err.CLIENT_ERROR, model.Result{
+			Success: common_err.CLIENT_ERROR,
+			Message: fmt.Sprintf("interval_ms must be between %d and %d", service.MinHardwareStatusIntervalMs, service.MaxHardwareStatusIntervalMs),
+		})
 	}
 
 	if err := service.RescheduleHardwareStatus(request.IntervalMs); err != nil {

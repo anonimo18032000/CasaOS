@@ -22,7 +22,11 @@ func InitHardwareStatusCron() {
 	// this package already imports route/v1) - they go through this indirection in service instead.
 	service.RescheduleHardwareStatusFunc = RescheduleHardwareStatus
 
-	_ = RescheduleHardwareStatus(config.ServerInfo.HardwareStatusIntervalMs)
+	interval := config.ServerInfo.HardwareStatusIntervalMs
+	if interval < service.MinHardwareStatusIntervalMs || interval > service.MaxHardwareStatusIntervalMs {
+		interval = service.DefaultHardwareStatusIntervalMs
+	}
+	_ = RescheduleHardwareStatus(interval)
 }
 
 // RescheduleHardwareStatus changes how often CPU/memory/network stats are pushed to the
@@ -33,8 +37,8 @@ func InitHardwareStatusCron() {
 // so a sub-second interval like "250ms" would quietly run at 1s instead. A plain time.Ticker has
 // no such floor.
 func RescheduleHardwareStatus(intervalMs int) error {
-	if intervalMs <= 0 {
-		return fmt.Errorf("interval must be positive")
+	if intervalMs < service.MinHardwareStatusIntervalMs || intervalMs > service.MaxHardwareStatusIntervalMs {
+		return fmt.Errorf("interval must be between %d and %d ms", service.MinHardwareStatusIntervalMs, service.MaxHardwareStatusIntervalMs)
 	}
 
 	hardwareStatusMu.Lock()

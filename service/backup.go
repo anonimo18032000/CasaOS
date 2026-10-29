@@ -85,7 +85,19 @@ func (s *backupStruct) save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(backupJobsFilePath(), data, 0o600)
+
+	// write to a temp file and rename, so a crash mid-write can't leave a truncated jobs file
+	// (load() would treat that as "no jobs" and the next save would wipe them all).
+	path := backupJobsFilePath()
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, 0o600); err != nil {
+		return err
+	}
+	if err := os.Rename(tmp, path); err != nil {
+		_ = os.Remove(tmp)
+		return err
+	}
+	return nil
 }
 
 func (s *backupStruct) ListJobs() []BackupJob {

@@ -87,6 +87,9 @@ func UmountStorage(ctx echo.Context) error {
 		if keyFile := cfg["key_file"]; keyFile != "" {
 			_ = os.Remove(keyFile)
 		}
+		if knownHosts := cfg["known_hosts_file"]; knownHosts != "" {
+			_ = os.Remove(knownHosts)
+		}
 	}
 	service.MyService.Storage().DeleteConfigByName(name)
 	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS), Data: "success"})
