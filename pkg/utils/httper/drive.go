@@ -173,9 +173,13 @@ func CreateConfigWithObscure(data map[string]string, name, t string) error {
 // TestConnection checks that fs (a remote, optionally with a path e.g. "name:/path") is reachable
 // and listable, without creating a mount. Used to validate credentials before committing to a mount.
 func TestConnection(fs string) error {
+	// LowLevelRetries=1: with rclone's default (10) a wrong password/host takes ~25s to fail, longer
+	// than this client's timeout, so the caller would only ever see "context deadline exceeded"
+	// instead of the real error.
 	res, err := NewHealthCheckRestyClient().R().SetFormData(map[string]string{
-		"fs":     fs,
-		"remote": "",
+		"fs":      fs,
+		"remote":  "",
+		"_config": `{"LowLevelRetries":1}`,
 	}).Post("/operations/list")
 	if err != nil {
 		return err
