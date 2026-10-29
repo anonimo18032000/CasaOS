@@ -82,7 +82,7 @@ UNAME_U="$(uname -s)"
 readonly UNAME_U
 
 readonly CASA_CONF_PATH=/etc/casaos/gateway.ini
-# Uninstall script isn't part of the fork; keep using the official one.
+# Uninstall script is hosted in this fork (copied from IceWhaleTech/get); upstream raw URL is the fallback.
 readonly CASA_UNINSTALL_URL="https://raw.githubusercontent.com/anonimo18032000/CasaOS/main/uninstall.sh"
 readonly CASA_UNINSTALL_FALLBACK_URL="https://raw.githubusercontent.com/IceWhaleTech/get/main/uninstall.sh"
 readonly CASA_UNINSTALL_PATH=/usr/bin/casaos-uninstall
@@ -113,6 +113,7 @@ REGION="UNKNOWN"
 CASA_DOWNLOAD_DOMAIN="https://github.com/"
 
 # FORK VARIABLES
+readonly INSTALLER_REVISION="2026-10-29.2"
 readonly FORK_OWNER="anonimo18032000"
 readonly FORK_CASAOS_TAG="v0.4.15-fork.1"
 readonly FORK_GATEWAY_TAG="v0.4.9-alpha4-fork.1"
@@ -199,19 +200,6 @@ exist_file() {
 
 
 
-# 0 Get download url domain
-# To solve the problem that Chinese users cannot access github.
-Get_Download_Url_Domain() {
-    # Use ipconfig.io/country and https://ifconfig.io/country_code to get the country code
-    REGION=$(${sudo_cmd} curl --connect-timeout 2 -s ipconfig.io/country || echo "")
-    if [ "${REGION}" = "" ]; then
-       REGION=$(${sudo_cmd} curl --connect-timeout 2 -s https://ifconfig.io/country_code || echo "")
-    fi
-    if [[ "${REGION}" = "China" ]] || [[ "${REGION}" = "CN" ]]; then
-        Show 3 "Detected region China: the fork's binaries are only hosted on GitHub, not on the CN mirror. Continuing with GitHub directly (may be slow/unreachable)."
-    fi
-}
-
 # 1 Check Arch
 Check_Arch() {
     case $UNAME_M in
@@ -246,8 +234,13 @@ Check_Arch() {
         CASAOS_PKG="${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS/releases/download/v0.4.15/linux-${TARGET_ARCH}-casaos-v0.4.15.tar.gz"
     fi
 
-    # CasaOS-UI is arch-independent ("linux-all") - always take the fork build.
-    UI_PKG="https://github.com/${FORK_OWNER}/CasaOS-UI/releases/download/${FORK_UI_TAG}/linux-all-casaos-${FORK_UI_TAG}.tar.gz"
+    # The fork UI talks to fork-only endpoints (SFTP, backups, HTTPS), so it is only used together
+    # with the fork's amd64 backend; other architectures get the matching upstream UI.
+    if [[ "$TARGET_ARCH" == "amd64" ]]; then
+        UI_PKG="https://github.com/${FORK_OWNER}/CasaOS-UI/releases/download/${FORK_UI_TAG}/linux-all-casaos-${FORK_UI_TAG}.tar.gz"
+    else
+        UI_PKG="${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-UI/releases/download/v0.4.25/linux-all-casaos-v0.4.25.tar.gz"
+    fi
 
     CASA_PACKAGES=(
         "${GATEWAY_PKG}"
@@ -261,6 +254,39 @@ Check_Arch() {
         "${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/CasaOS-AppStore/releases/download/v0.4.5/linux-all-appstore-v0.4.5.tar.gz"
     )
 }
+
+# SHA-256 of every package the installer downloads. A package that is missing here or does not
+# match aborts the install. When a fork release is rebuilt, update its entry (GitHub shows the
+# digest on the release asset; for others run sha256sum on the downloaded file).
+declare -A CASA_SHA256=(
+    ["linux-all-appstore-v0.4.5.tar.gz"]="4f346a057097c09706813052c3ef5d0ef49b609aea320b4fcf3af7609b3957b5"
+    ["linux-all-casaos-v0.4.25-fork.1.tar.gz"]="511caf8504dc9578fb67893e0063c91849b5a1f4e46851aa35b628f6aa317fe4"
+    ["linux-all-casaos-v0.4.25.tar.gz"]="390d399ba89aeba9ce2747ea58348acb0c86740fb55a6e617eb42a1d3f715bf5"
+    ["linux-amd64-casaos-app-management-v0.4.10-alpha2-fork.1.tar.gz"]="c2c58027aea87ce834cb3d8b79ae053aa9d344a804226e3940c622fcd304ccdd"
+    ["linux-amd64-casaos-app-management-v0.4.10-alpha2.tar.gz"]="161557e5fbe9066183746798af090f62d33da7b80f9b1ad5159e9fe9dbdfbe2b"
+    ["linux-amd64-casaos-cli-v0.4.4-3-alpha1.tar.gz"]="d25ad6bbd68f555f20ec0ab4a0984ca2691a68e112562dc613d5707493173a0d"
+    ["linux-amd64-casaos-gateway-v0.4.9-alpha4-fork.1.tar.gz"]="25fb8877623e202000a03e8e9ff9b1041d8c30fb672ebadbe2173625376eb138"
+    ["linux-amd64-casaos-gateway-v0.4.9-alpha4.tar.gz"]="458e66bdd8f8ad63fe5610c01dd76bb76d5054c899c92f2bba31be36d769c798"
+    ["linux-amd64-casaos-local-storage-v0.4.4.tar.gz"]="523edb627ec11b1bc74d408a6929028903ff404115d316d1fb7f40cf819ba831"
+    ["linux-amd64-casaos-message-bus-v0.4.4-3-alpha2.tar.gz"]="29823621aaa33dd22271f436e741f5959a7df6a7d5540036a5da866de0f7c7fe"
+    ["linux-amd64-casaos-user-service-v0.4.8.tar.gz"]="62f3d12d93215af58af3d9da4448b244b33b533a0321afa46229fde1f6d66bab"
+    ["linux-amd64-casaos-v0.4.15-fork.1.tar.gz"]="4d28ae5afa52e54f7545c0299577a0432d5968b0d3e4790ab605bfd6c44ede8c"
+    ["linux-amd64-casaos-v0.4.15.tar.gz"]="8e5bd4372fa8a32e6c7c4f35617d27613fcce7a6be25ba92593c81cade3b2317"
+    ["linux-arm-7-casaos-app-management-v0.4.10-alpha2.tar.gz"]="9229b04f0bb62c76806578efcd84fea3df05c5473e51c6b1972aa92f216b9fad"
+    ["linux-arm-7-casaos-cli-v0.4.4-3-alpha1.tar.gz"]="3a92be9f37471c89e28cf30f32864aa93816a54dc28440645c48369f598a1b3e"
+    ["linux-arm-7-casaos-gateway-v0.4.9-alpha4.tar.gz"]="a9028a0bdb8e0bc38f0b85910cd588d983a0af88d4b43dd047d6059552ce1e9b"
+    ["linux-arm-7-casaos-local-storage-v0.4.4.tar.gz"]="4499289a19c078c9016bf6a6defb167b559aae6594b8035feaa5345c372b9b6d"
+    ["linux-arm-7-casaos-message-bus-v0.4.4-3-alpha2.tar.gz"]="b608c4dd601a0c41608eb1a443e83b5b85b9b4b89bacfb20e6174333fac2a065"
+    ["linux-arm-7-casaos-user-service-v0.4.8.tar.gz"]="6228e6a6cdf625ce775a7405516822e50bfe6773fc6ee267fc21440686fdd1bb"
+    ["linux-arm-7-casaos-v0.4.15.tar.gz"]="e294232d173ba6102c658ad3af2f7eec53c6a24188b2f03a046a57263f593fb7"
+    ["linux-arm64-casaos-app-management-v0.4.10-alpha2.tar.gz"]="014437d988f072b95cc0dd14f9df4a7b49bdc980a2a4a6bb05d8acea6abaa984"
+    ["linux-arm64-casaos-cli-v0.4.4-3-alpha1.tar.gz"]="30f05faa9607c59942d149d31fac15b7c13a19f2b785d937605f0fdc246a47fb"
+    ["linux-arm64-casaos-gateway-v0.4.9-alpha4.tar.gz"]="9fb893eab310996d88ffab7081f3e026d92aa4d27e51b8c2ee5ce19171b42ab9"
+    ["linux-arm64-casaos-local-storage-v0.4.4.tar.gz"]="b023987bf24251ede5c7d57bdbbe4b8f6ed12cfdbe1ad9e7704bb8f15ac382d2"
+    ["linux-arm64-casaos-message-bus-v0.4.4-3-alpha2.tar.gz"]="9ea763674a21340c874397aa81fa5fde7e4d5ada574b14fe88871956fa066ecf"
+    ["linux-arm64-casaos-user-service-v0.4.8.tar.gz"]="5396e92f74398801915f446c179cc18b949e0be0a3667bbb104ac9f2c650dfca"
+    ["linux-arm64-casaos-v0.4.15.tar.gz"]="9d5fa2c46278f83b08b2611599a0f1fe15cfcf27ca89aa8d2daa8f88d3dd0a26"
+)
 
 # PACKAGE LIST OF CASAOS (make sure the services are in the right order)
 CASA_SERVICES=(
@@ -450,8 +476,8 @@ Check_Docker_Running() {
     for ((i = 1; i <= 3; i++)); do
         sleep 3
         if [[ ! $(${sudo_cmd} systemctl is-active docker) == "active" ]]; then
-            Show 1 "Docker is not running, try to start"
-            ${sudo_cmd} systemctl start docker
+            Show 3 "Docker is not running, trying to start it..."
+            ${sudo_cmd} systemctl start docker || true
         else
             break
         fi
@@ -465,7 +491,7 @@ Check_Docker_Install() {
         if [[ $? -ne 0 ]]; then
             Install_Docker
         elif [[ ${Docker_Version:0:2} -lt "${MINIMUM_DOCKER_VERSION}" ]]; then
-            Show 1 "Recommended minimum Docker version is \e[33m${MINIMUM_DOCKER_VERSION}.xx.xx\e[0m,\Current Docker version is \e[33m${Docker_Version}\e[0m,\nPlease uninstall current Docker and rerun the CasaOS installation script."
+            Show 1 "Recommended minimum Docker version is \e[33m${MINIMUM_DOCKER_VERSION}.xx.xx\e[0m,\nCurrent Docker version is \e[33m${Docker_Version}\e[0m,\nPlease uninstall current Docker and rerun the CasaOS installation script."
             exit 1
         else
             Show 0 "Current Docker version is ${Docker_Version}."
@@ -482,7 +508,7 @@ Check_Docker_Install_Final() {
         if [[ $? -ne 0 ]]; then
             Install_Docker
         elif [[ ${Docker_Version:0:2} -lt "${MINIMUM_DOCKER_VERSION}" ]]; then
-            Show 1 "Recommended minimum Docker version is \e[33m${MINIMUM_DOCKER_VERSION}.xx.xx\e[0m,\Current Docker version is \e[33m${Docker_Version}\e[0m,\nPlease uninstall current Docker and rerun the CasaOS installation script."
+            Show 1 "Recommended minimum Docker version is \e[33m${MINIMUM_DOCKER_VERSION}.xx.xx\e[0m,\nCurrent Docker version is \e[33m${Docker_Version}\e[0m,\nPlease uninstall current Docker and rerun the CasaOS installation script."
             exit 1
         else
             Show 0 "Current Docker version is ${Docker_Version}."
@@ -519,17 +545,22 @@ Apply_Docker_API_Override() {
     Show 2 "Applying Docker API compatibility override for CasaOS..."
     local override_dir="/etc/systemd/system/docker.service.d"
     local override_file="${override_dir}/override.conf"
+    local wanted=$'[Service]
+Environment=DOCKER_MIN_API_VERSION=1.24
+'
+
+    # Restarting Docker restarts every container, so only touch it when the override is missing or
+    # different (e.g. not on re-runs / updates started from the CasaOS UI).
+    if [[ -f "${override_file}" && "$(cat "${override_file}")" == "${wanted%$'
+'}" ]]; then
+        Show 0 "Docker API override already in place."
+        return
+    fi
 
     ${sudo_cmd} mkdir -p "${override_dir}" || Show 3 "Failed to create ${override_dir} (non-fatal)."
-
-    ${sudo_cmd} tee "${override_file}" >/dev/null <<'EOF'
-[Service]
-Environment=DOCKER_MIN_API_VERSION=1.24
-EOF
-
+    printf '%s' "${wanted}" | ${sudo_cmd} tee "${override_file}" >/dev/null
     Show 0 "Docker API override written to ${override_file}"
 
-    # Reload systemd and restart Docker to apply the override
     ${sudo_cmd} systemctl daemon-reload || Show 3 "systemd daemon-reload failed (non-fatal)."
     if ! ${sudo_cmd} systemctl restart docker; then
         Show 3 "Failed to restart Docker after API override. Please check 'systemctl status docker'."
@@ -646,6 +677,16 @@ DownloadAndInstallCasaOS() {
             GreyStart
             ${sudo_cmd} wget -t 3 -q --show-progress -c  "${PACKAGE}" || Show 1 "Failed to download package"
             ColorReset
+
+            PACKAGE_NAME=$(basename "${PACKAGE}")
+            EXPECTED_SHA256="${CASA_SHA256[${PACKAGE_NAME}]:-}"
+            if [[ -z "${EXPECTED_SHA256}" ]]; then
+                Show 1 "No known checksum for ${PACKAGE_NAME}; refusing to install an unverified package."
+            fi
+            ACTUAL_SHA256=$(sha256sum "${PACKAGE_NAME}" | cut -d' ' -f1)
+            if [[ "${ACTUAL_SHA256}" != "${EXPECTED_SHA256}" ]]; then
+                Show 1 "Checksum mismatch for ${PACKAGE_NAME} (expected ${EXPECTED_SHA256}, got ${ACTUAL_SHA256})."
+            fi
         done
 
         for PACKAGE_FILE in linux-*.tar.gz; do
@@ -711,9 +752,6 @@ DownloadAndInstallCasaOS() {
         ${sudo_cmd} chmod +x $UI_EVENTS_REG_SCRIPT
     fi
 
-    # App store configuration keeps pointing at the official upstream appstore mirror.
-    sed -i "s#https://github.com/IceWhaleTech/_appstore/#${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/_appstore/#g" "$PREFIX/etc/casaos/app-management.conf"
-
     #Download Uninstall Script (optional: a failure here must not abort the install)
     ${sudo_cmd} rm -f "$PREFIX/tmp/casaos-uninstall"
     if ${sudo_cmd} curl -fsSL --retry 3 "$CASA_UNINSTALL_URL" -o "$PREFIX/tmp/casaos-uninstall" ||
@@ -737,7 +775,8 @@ DownloadAndInstallCasaOS() {
 
 Clean_Temp_Files() {
     Show 2 "Clean temporary files..."
-    ${sudo_cmd} rm -rf "${TMP_DIR}" || Show 1 "Failed to clean temporary files"
+    [[ -n "${TMP_DIR:-}" ]] && { ${sudo_cmd} rm -rf "${TMP_DIR}" || Show 1 "Failed to clean temporary files"; }
+    return 0
 }
 
 Check_Service_status() {
@@ -754,15 +793,31 @@ Check_Service_status() {
 
 # Get the physical NIC IP
 Get_IPs() {
-    PORT=$(${sudo_cmd} cat ${CASA_CONF_PATH} | grep port | sed 's/port=//')
-    ALL_NIC=$($sudo_cmd ls /sys/class/net/ | grep -v "$(ls /sys/devices/virtual/net/)")
+    local conf
+    conf=$(${sudo_cmd} cat "${CASA_CONF_PATH}" 2>/dev/null || true)
+    # exact keys only: gateway.ini also has tlsport=, which a plain `grep port` would match
+    local PORT TLS_ENABLED TLS_PORT
+    PORT=$(echo "${conf}" | grep -E '^port[[:space:]]*=' | head -n 1 | cut -d= -f2 | tr -d '[:space:]' || true)
+    TLS_ENABLED=$(echo "${conf}" | grep -E '^tlsenabled[[:space:]]*=' | head -n 1 | cut -d= -f2 | tr -d '[:space:]' || true)
+    TLS_PORT=$(echo "${conf}" | grep -E '^tlsport[[:space:]]*=' | head -n 1 | cut -d= -f2 | tr -d '[:space:]' || true)
+    [[ "${PORT}" =~ ^[0-9]+$ ]] || PORT=80
+    [[ "${TLS_PORT}" =~ ^[0-9]+$ ]] || TLS_PORT=443
+
+    local ALL_NIC NIC IP
+    ALL_NIC=$(${sudo_cmd} ls /sys/class/net/ | grep -v "$(ls /sys/devices/virtual/net/)" || true)
     for NIC in ${ALL_NIC}; do
-        IP=$($sudo_cmd ifconfig "${NIC}" | grep inet | grep -v 127.0.0.1 | grep -v inet6 | awk '{print $2}' | sed -e 's/addr://g')
-        if [[ -n $IP ]]; then
-            if [[ "$PORT" -eq "80" ]]; then
-                echo -e "${GREEN_BULLET} http://$IP (${NIC})"
+        IP=$(${sudo_cmd} ip -4 -o addr show dev "${NIC}" 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true)
+        if [[ -n ${IP} ]]; then
+            if [[ "${TLS_ENABLED}" == "true" ]]; then
+                if [[ "${TLS_PORT}" -eq 443 ]]; then
+                    echo -e "${GREEN_BULLET} https://${IP} (${NIC})"
+                else
+                    echo -e "${GREEN_BULLET} https://${IP}:${TLS_PORT} (${NIC})"
+                fi
+            elif [[ "${PORT}" -eq 80 ]]; then
+                echo -e "${GREEN_BULLET} http://${IP} (${NIC})"
             else
-                echo -e "${GREEN_BULLET} http://$IP:$PORT (${NIC})"
+                echo -e "${GREEN_BULLET} http://${IP}:${PORT} (${NIC})"
             fi
         fi
     done
@@ -779,7 +834,7 @@ Welcome_Banner() {
     echo -e " Open your browser and visit the above address."
     echo -e "${GREEN_LINE}"
     echo -e ""
-    echo -e " ${aCOLOUR[2]}Fork Project    : https://github.com/${FORK_OWNER}"
+    echo -e " ${aCOLOUR[2]}Fork Project    : https://github.com/${FORK_OWNER} (installer ${INSTALLER_REVISION})"
     echo -e " ${aCOLOUR[2]}Upstream Project: https://github.com/IceWhaleTech/CasaOS"
     echo -e ""
     echo -e " ${COLOUR_RESET}${aCOLOUR[1]}Uninstall       ${COLOUR_RESET}: casaos-uninstall"
@@ -815,8 +870,6 @@ while getopts ":p:h" arg; do
     esac
 done
 
-# Step 0 : Get Download Url Domain
-Get_Download_Url_Domain
 # Step 1: Check ARCH
 Check_Arch
 
@@ -848,5 +901,6 @@ DownloadAndInstallCasaOS
 # Step 9: Check Service Status
 Check_Service_status
 
-# Step 10: Clear Term and Show Welcome Banner
+# Step 10: Remove temporary files, then show the welcome banner
+Clean_Temp_Files
 Welcome_Banner
