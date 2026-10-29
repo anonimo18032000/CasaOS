@@ -113,12 +113,12 @@ REGION="UNKNOWN"
 CASA_DOWNLOAD_DOMAIN="https://github.com/"
 
 # FORK VARIABLES
-readonly INSTALLER_REVISION="2026-10-29.2"
+readonly INSTALLER_REVISION="2026-10-29.3"
 readonly FORK_OWNER="anonimo18032000"
-readonly FORK_CASAOS_TAG="v0.4.15-fork.1"
-readonly FORK_GATEWAY_TAG="v0.4.9-alpha4-fork.1"
-readonly FORK_APPMANAGEMENT_TAG="v0.4.10-alpha2-fork.1"
-readonly FORK_UI_TAG="v0.4.25-fork.1"
+readonly FORK_CASAOS_TAG="v0.4.15-fork.2"
+readonly FORK_GATEWAY_TAG="v0.4.9-alpha4-fork.2"
+readonly FORK_APPMANAGEMENT_TAG="v0.4.10-alpha2-fork.2"
+readonly FORK_UI_TAG="v0.4.25-fork.2"
 
 trap 'onCtrlC' INT
 onCtrlC() {
@@ -260,17 +260,17 @@ Check_Arch() {
 # digest on the release asset; for others run sha256sum on the downloaded file).
 declare -A CASA_SHA256=(
     ["linux-all-appstore-v0.4.5.tar.gz"]="4f346a057097c09706813052c3ef5d0ef49b609aea320b4fcf3af7609b3957b5"
-    ["linux-all-casaos-v0.4.25-fork.1.tar.gz"]="511caf8504dc9578fb67893e0063c91849b5a1f4e46851aa35b628f6aa317fe4"
+    ["linux-all-casaos-v0.4.25-fork.2.tar.gz"]="892e54d89dd7aea3ce657f14329fa59bdcd042e084004cf38c9392de8be9d092"
     ["linux-all-casaos-v0.4.25.tar.gz"]="390d399ba89aeba9ce2747ea58348acb0c86740fb55a6e617eb42a1d3f715bf5"
-    ["linux-amd64-casaos-app-management-v0.4.10-alpha2-fork.1.tar.gz"]="c2c58027aea87ce834cb3d8b79ae053aa9d344a804226e3940c622fcd304ccdd"
+    ["linux-amd64-casaos-app-management-v0.4.10-alpha2-fork.2.tar.gz"]="d16439c9866ff20b3688dbda5ad621ff3239f1403f7c41b473329832e4b2e0dd"
     ["linux-amd64-casaos-app-management-v0.4.10-alpha2.tar.gz"]="161557e5fbe9066183746798af090f62d33da7b80f9b1ad5159e9fe9dbdfbe2b"
     ["linux-amd64-casaos-cli-v0.4.4-3-alpha1.tar.gz"]="d25ad6bbd68f555f20ec0ab4a0984ca2691a68e112562dc613d5707493173a0d"
-    ["linux-amd64-casaos-gateway-v0.4.9-alpha4-fork.1.tar.gz"]="25fb8877623e202000a03e8e9ff9b1041d8c30fb672ebadbe2173625376eb138"
+    ["linux-amd64-casaos-gateway-v0.4.9-alpha4-fork.2.tar.gz"]="22199f704bf1ae5642869116593985a0bd5dbb461efd66013bee48ff8fa32f69"
     ["linux-amd64-casaos-gateway-v0.4.9-alpha4.tar.gz"]="458e66bdd8f8ad63fe5610c01dd76bb76d5054c899c92f2bba31be36d769c798"
     ["linux-amd64-casaos-local-storage-v0.4.4.tar.gz"]="523edb627ec11b1bc74d408a6929028903ff404115d316d1fb7f40cf819ba831"
     ["linux-amd64-casaos-message-bus-v0.4.4-3-alpha2.tar.gz"]="29823621aaa33dd22271f436e741f5959a7df6a7d5540036a5da866de0f7c7fe"
     ["linux-amd64-casaos-user-service-v0.4.8.tar.gz"]="62f3d12d93215af58af3d9da4448b244b33b533a0321afa46229fde1f6d66bab"
-    ["linux-amd64-casaos-v0.4.15-fork.1.tar.gz"]="4d28ae5afa52e54f7545c0299577a0432d5968b0d3e4790ab605bfd6c44ede8c"
+    ["linux-amd64-casaos-v0.4.15-fork.2.tar.gz"]="9d837cf41305c8c9855b1746aadcf09eb304ff76a4f3aa2bbea7b5e09852b6e0"
     ["linux-amd64-casaos-v0.4.15.tar.gz"]="8e5bd4372fa8a32e6c7c4f35617d27613fcce7a6be25ba92593c81cade3b2317"
     ["linux-arm-7-casaos-app-management-v0.4.10-alpha2.tar.gz"]="9229b04f0bb62c76806578efcd84fea3df05c5473e51c6b1972aa92f216b9fad"
     ["linux-arm-7-casaos-cli-v0.4.4-3-alpha1.tar.gz"]="3a92be9f37471c89e28cf30f32864aa93816a54dc28440645c48369f598a1b3e"
