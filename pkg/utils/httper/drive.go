@@ -90,9 +90,9 @@ func GetMountList() (MountList, error) {
 		return result, fmt.Errorf("get mount list failed")
 	}
 	json.Unmarshal(res.Body(), &result)
-	for i := 0; i < len(result.MountPoints); i++ {
-		result.MountPoints[i].Fs = result.MountPoints[i].Fs[:len(result.MountPoints[i].Fs)-1]
-	}
+	// Fs is returned exactly as rclone reports it ("name:" or "name:/path"). It used to lose its last
+	// character here, which turned "name:" into the local path "name" and "name:/home/x" into
+	// "name:/home/", so health checks of any storage not mounted at "/" failed.
 	return result, err
 }
 
