@@ -83,7 +83,8 @@ readonly UNAME_U
 
 readonly CASA_CONF_PATH=/etc/casaos/gateway.ini
 # Uninstall script isn't part of the fork; keep using the official one.
-readonly CASA_UNINSTALL_URL="https://get.casaos.io/uninstall/v0.4.16"
+readonly CASA_UNINSTALL_URL="https://raw.githubusercontent.com/anonimo18032000/CasaOS/main/uninstall.sh"
+readonly CASA_UNINSTALL_FALLBACK_URL="https://raw.githubusercontent.com/IceWhaleTech/get/main/uninstall.sh"
 readonly CASA_UNINSTALL_PATH=/usr/bin/casaos-uninstall
 
 # REQUIREMENTS CONF PATH
@@ -543,16 +544,33 @@ EOF
 
 #Install Rclone
 Install_rclone_from_source() {
-  ${sudo_cmd} wget -qO ./install.sh https://rclone.org/install.sh
-  sed -i 's/downloads.rclone.org/get.casaos.io/g' ./install.sh
-  ${sudo_cmd} chmod +x ./install.sh
-  ${sudo_cmd} ./install.sh || {
-    Show 1 "Installation failed, please try again."
-    ${sudo_cmd} rm -rf install.sh
+  local rclone_version="v1.61.1"
+  local zip_name="rclone-${rclone_version}-linux-amd64.zip"
+  local rclone_tmp
+  rclone_tmp=$(mktemp -d)
+  if ! ${sudo_cmd} wget -q -O "${rclone_tmp}/${zip_name}" "https://downloads.rclone.org/${rclone_version}/${zip_name}" &&
+    ! ${sudo_cmd} wget -q -O "${rclone_tmp}/${zip_name}" "https://github.com/rclone/rclone/releases/download/${rclone_version}/${zip_name}"; then
+    rm -rf "${rclone_tmp}"
+    Show 1 "Failed to download rclone ${rclone_version}, please try again."
+    exit 1
+  fi
+  unzip -q -o "${rclone_tmp}/${zip_name}" -d "${rclone_tmp}" || {
+    rm -rf "${rclone_tmp}"
+    Show 1 "Failed to extract rclone ${rclone_version}."
     exit 1
   }
-  ${sudo_cmd} rm -rf install.sh
-  Show 0 "Rclone v1.61.1 installed successfully."
+  local rclone_dir="${rclone_tmp}/rclone-${rclone_version}-linux-amd64"
+  ${sudo_cmd} install -m 0755 "${rclone_dir}/rclone" "${PREFIX}/usr/bin/rclone" || {
+    rm -rf "${rclone_tmp}"
+    Show 1 "Failed to install rclone binary."
+    exit 1
+  }
+  if [[ -f "${rclone_dir}/rclone.1" ]]; then
+    ${sudo_cmd} mkdir -p "${PREFIX}/usr/share/man/man1"
+    ${sudo_cmd} install -m 0644 "${rclone_dir}/rclone.1" "${PREFIX}/usr/share/man/man1/rclone.1"
+  fi
+  rm -rf "${rclone_tmp}"
+  Show 0 "Rclone ${rclone_version} installed successfully."
 }
 
 Install_Rclone() {
@@ -696,17 +714,16 @@ DownloadAndInstallCasaOS() {
     # App store configuration keeps pointing at the official upstream appstore mirror.
     sed -i "s#https://github.com/IceWhaleTech/_appstore/#${CASA_DOWNLOAD_DOMAIN}IceWhaleTech/_appstore/#g" "$PREFIX/etc/casaos/app-management.conf"
 
-    #Download Uninstall Script
-    if [[ -f $PREFIX/tmp/casaos-uninstall ]]; then
-        ${sudo_cmd} rm -rf "$PREFIX/tmp/casaos-uninstall"
+    #Download Uninstall Script (optional: a failure here must not abort the install)
+    ${sudo_cmd} rm -f "$PREFIX/tmp/casaos-uninstall"
+    if ${sudo_cmd} curl -fsSL --retry 3 "$CASA_UNINSTALL_URL" -o "$PREFIX/tmp/casaos-uninstall" ||
+        ${sudo_cmd} curl -fsSL --retry 3 "$CASA_UNINSTALL_FALLBACK_URL" -o "$PREFIX/tmp/casaos-uninstall"; then
+        ${sudo_cmd} cp -f "$PREFIX/tmp/casaos-uninstall" "$CASA_UNINSTALL_PATH" &&
+            ${sudo_cmd} chmod +x "$CASA_UNINSTALL_PATH" ||
+            Show 3 "Could not install the uninstall script to ${CASA_UNINSTALL_PATH}."
+    else
+        Show 3 "Could not download the uninstall script; continuing without it."
     fi
-    ${sudo_cmd} curl -fsSLk "$CASA_UNINSTALL_URL" >"$PREFIX/tmp/casaos-uninstall"
-    ${sudo_cmd} cp -rf "$PREFIX/tmp/casaos-uninstall" $CASA_UNINSTALL_PATH || {
-        Show 1 "Download uninstall script failed, Please check if your internet connection is working and retry."
-        exit 1
-    }
-
-    ${sudo_cmd} chmod +x $CASA_UNINSTALL_PATH
 
     Install_Rclone
 
