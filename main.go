@@ -25,6 +25,7 @@ import (
 	"github.com/IceWhaleTech/CasaOS/pkg/sqlite"
 	"github.com/IceWhaleTech/CasaOS/pkg/utils/file"
 	"github.com/IceWhaleTech/CasaOS/route"
+	v1 "github.com/IceWhaleTech/CasaOS/route/v1"
 	"github.com/IceWhaleTech/CasaOS/service"
 	"github.com/coreos/go-systemd/daemon"
 	"go.uber.org/zap"
@@ -118,6 +119,7 @@ func main() {
 	}
 
 	route.InitHardwareStatusCron()
+	v1.StartStorageHealthSampler()
 
 	listener, err := net.Listen("tcp", net.JoinHostPort(LOCALHOST, "0"))
 	if err != nil {
@@ -135,6 +137,8 @@ func main() {
 		"/v1/driver",
 		"/v1/cloud",
 		"/v1/backup",
+		"/v1/sharelinks",
+		"/v1/pubshare",
 		"/v1/recover",
 		"/v1/other",
 		"/v1/zt",

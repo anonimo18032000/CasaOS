@@ -39,6 +39,9 @@ func InitV1Router() http.Handler {
 		return ctx.String(200, "pong")
 	})
 	e.GET("/v1/recover/:type", v1.GetRecoverStorage)
+	// public download links: unauthenticated by design, they only serve the one file of a valid token
+	e.GET("/v1/pubshare/:token", v1.PublicShareDownload)
+	e.POST("/v1/pubshare/:token", v1.PublicShareDownload)
 	v1Group := e.Group("/v1")
 	//	e.Any("/v1/test", v1.CheckNetwork)
 	v1Group.Use(echo_middleware.JWTWithConfig(echo_middleware.JWTConfig{
@@ -99,6 +102,8 @@ func InitV1Router() http.Handler {
 			v1SysGroup.PUT("/state/:state", v1.PutSystemState)
 			v1SysGroup.GET("/entry", v1.GetSystemEntry)
 			v1SysGroup.GET("/hardware-status-interval", v1.GetHardwareStatusInterval)
+			v1SysGroup.GET("/config-backup", v1.ExportConfigBackup)
+			v1SysGroup.POST("/config-backup", v1.ImportConfigBackup)
 			v1SysGroup.PUT("/hardware-status-interval", v1.SetHardwareStatusInterval)
 		}
 		v1PortGroup := v1Group.Group("/port")
@@ -124,6 +129,7 @@ func InitV1Router() http.Handler {
 			// v1FileGroup.GET("/download", v1.UserFileDownloadCommonService)
 			v1FileGroup.GET("/ws", v1.ConnectWebSocket)
 			v1FileGroup.GET("/peers", v1.GetPeers)
+			v1FileGroup.GET("/search", v1.SearchFiles)
 		}
 		v1CloudGroup := v1Group.Group("/cloud")
 		v1CloudGroup.Use()
@@ -134,6 +140,7 @@ func InitV1Router() http.Handler {
 			v1CloudGroup.POST("/sftp/test", v1.TestSFTPStorage)
 			v1CloudGroup.PUT("/sftp", v1.EditSFTPStorage)
 			v1CloudGroup.GET("/health", v1.GetStoragesHealth)
+			v1CloudGroup.GET("/health/history", v1.GetStoragesHealthHistory)
 			v1CloudGroup.POST("/reconnect", v1.ReconnectStorage)
 		}
 		v1BackupGroup := v1Group.Group("/backup")
@@ -144,6 +151,14 @@ func InitV1Router() http.Handler {
 			v1BackupGroup.PUT("/:id", v1.EditBackupJob)
 			v1BackupGroup.DELETE("/:id", v1.DeleteBackupJob)
 			v1BackupGroup.POST("/:id/run", v1.RunBackupJobNow)
+			v1BackupGroup.GET("/:id/progress", v1.GetBackupProgress)
+		}
+		v1ShareLinkGroup := v1Group.Group("/sharelinks")
+		v1ShareLinkGroup.Use()
+		{
+			v1ShareLinkGroup.GET("", v1.ListShareLinks)
+			v1ShareLinkGroup.POST("", v1.CreateShareLink)
+			v1ShareLinkGroup.DELETE("/:token", v1.DeleteShareLink)
 		}
 		v1DriverGroup := v1Group.Group("/driver")
 		v1DriverGroup.Use()
@@ -159,6 +174,7 @@ func InitV1Router() http.Handler {
 			v1FolderGroup.POST("", v1.MkdirAll) ///file/mkdir
 			v1FolderGroup.GET("/size", v1.GetSize)
 			v1FolderGroup.GET("/count", v1.GetFileCount)
+			v1FolderGroup.GET("/usage", v1.GetFolderUsage)
 		}
 		v1BatchGroup := v1Group.Group("/batch")
 		v1BatchGroup.Use()

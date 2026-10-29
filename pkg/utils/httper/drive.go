@@ -261,22 +261,22 @@ func DeleteConfigByName(name string) error {
 // Backups can run long, so this uses its own client with a much longer timeout than the other
 // rclone RC calls (which are all interactive, user-facing requests).
 func SyncCopy(srcPath string, dstFs string) error {
-	unixSocket := "/var/run/rclone/rclone.sock"
+	return SyncCopyGroup(srcPath, dstFs, "")
+}
 
-	transport := http.Transport{
-		Dial: func(_, _ string) (net.Conn, error) {
-			return net.Dial("unix", unixSocket)
-		},
-	}
+// SyncCopyGroup is SyncCopy with the transfer tagged as a rclone stats group, so that its progress
+// can be read back with GetGroupStats while it runs. An empty group means "no group".
+func SyncCopyGroup(srcPath string, dstFs string, group string) error {
+	client := newRcloneClient(4 * time.Hour)
 
-	client := resty.New()
-	client.SetTransport(&transport).SetBaseURL("http://localhost")
-	client.SetRetryCount(0).SetTimeout(4 * time.Hour).SetHeader("User-Agent", UserAgent)
-
-	res, err := client.R().SetFormData(map[string]string{
+	form := map[string]string{
 		"srcFs": srcPath,
 		"dstFs": dstFs,
-	}).Post("/sync/copy")
+	}
+	if group != "" {
+		form["_group"] = group
+	}
+	res, err := client.R().SetFormData(form).Post("/sync/copy")
 	if err != nil {
 		return err
 	}
@@ -289,4 +289,61 @@ func SyncCopy(srcPath string, dstFs string) error {
 		return fmt.Errorf("backup copy failed")
 	}
 	return nil
+}
+
+func newRcloneClient(timeout time.Duration) *resty.Client {
+	unixSocket := "/var/run/rclone/rclone.sock"
+
+	transport := http.Transport{
+		Dial: func(_, _ string) (net.Conn, error) {
+			return net.Dial("unix", unixSocket)
+		},
+	}
+
+	client := resty.New()
+	client.SetTransport(&transport).SetBaseURL("http://localhost")
+	client.SetRetryCount(0).SetTimeout(timeout).SetHeader("User-Agent", UserAgent)
+	return client
+}
+
+// GroupStats is the subset of rclone's core/stats that the UI shows as backup progress.
+type GroupStats struct {
+	Bytes          int64   `json:"bytes"`
+	TotalBytes     int64   `json:"totalBytes"`
+	Speed          float64 `json:"speed"`
+	ETA            *int64  `json:"eta"`
+	Transfers      int64   `json:"transfers"`
+	TotalTransfers int64   `json:"totalTransfers"`
+	Checks         int64   `json:"checks"`
+	Errors         int64   `json:"errors"`
+	LastError      string  `json:"lastError"`
+	Transferring   []struct {
+		Name       string  `json:"name"`
+		Size       int64   `json:"size"`
+		Bytes      int64   `json:"bytes"`
+		Percentage int     `json:"percentage"`
+		Speed      float64 `json:"speed"`
+	} `json:"transferring"`
+}
+
+// GetGroupStats reads the live statistics of a transfer started with SyncCopyGroup.
+func GetGroupStats(group string) (GroupStats, error) {
+	var stats GroupStats
+	res, err := newRcloneClient(10*time.Second).R().SetFormData(map[string]string{"group": group}).Post("/core/stats")
+	if err != nil {
+		return stats, err
+	}
+	if res.StatusCode() != 200 {
+		return stats, fmt.Errorf("core/stats failed: %s", res.Status())
+	}
+	if err := json.Unmarshal(res.Body(), &stats); err != nil {
+		return stats, err
+	}
+	return stats, nil
+}
+
+// ResetGroupStats forgets the statistics of a group, so the next run starts from zero (and rclone
+// does not keep one stats group per job forever).
+func ResetGroupStats(group string) {
+	_, _ = newRcloneClient(10*time.Second).R().SetFormData(map[string]string{"group": group}).Post("/core/stats-delete")
 }

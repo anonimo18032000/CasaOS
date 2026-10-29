@@ -38,6 +38,14 @@ type BackupService interface {
 	DeleteJob(id string) error
 	RunJob(id string) error
 	RunJobAsync(id string) error
+	Progress(id string) BackupProgress
+}
+
+// BackupProgress is what the UI polls while a job runs.
+type BackupProgress struct {
+	Running   bool               `json:"running"`
+	StartedAt string             `json:"started_at,omitempty"`
+	Stats     *httper.GroupStats `json:"stats,omitempty"`
 }
 
 func backupJobsFilePath() string {
@@ -50,6 +58,7 @@ type backupStruct struct {
 	cronJob  *cron.Cron
 	entryIDs map[string]cron.EntryID
 	running  map[string]bool
+	started  map[string]time.Time
 }
 
 // NewBackupService loads persisted backup jobs from disk and starts their cron schedules. Copies
@@ -60,6 +69,7 @@ func NewBackupService() BackupService {
 		cronJob:  cron.New(),
 		entryIDs: make(map[string]cron.EntryID),
 		running:  make(map[string]bool),
+		started:  make(map[string]time.Time),
 	}
 	s.load()
 	s.cronJob.Start()
@@ -222,18 +232,25 @@ func (s *backupStruct) RunJob(id string) error {
 		return fmt.Errorf("backup job is already running")
 	}
 	s.running[id] = true
+	startedAt := time.Now()
+	s.started[id] = startedAt
 	sourcePath := job.SourcePath
 	dstFs := job.RemoteName + ":" + job.RemotePath
+	jobName := job.Name
 	s.mu.Unlock()
 
+	group := backupStatsGroup(id)
 	defer func() {
 		s.mu.Lock()
 		delete(s.running, id)
+		delete(s.started, id)
 		s.mu.Unlock()
+		httper.ResetGroupStats(group)
 	}()
 
 	logger.Info("running backup job", zap.String("id", id), zap.String("source", sourcePath), zap.String("dst", dstFs))
-	runErr := httper.SyncCopy(sourcePath, dstFs)
+	httper.ResetGroupStats(group)
+	runErr := httper.SyncCopyGroup(sourcePath, dstFs, group)
 
 	s.mu.Lock()
 	for i := range s.jobs {
@@ -252,7 +269,49 @@ func (s *backupStruct) RunJob(id string) error {
 	_ = s.save()
 	s.mu.Unlock()
 
+	notifyBackupResult(id, jobName, runErr, time.Since(startedAt))
 	return runErr
+}
+
+func backupStatsGroup(id string) string {
+	return "backup-" + id
+}
+
+// Progress reports whether a job is running and, if so, rclone's live transfer statistics.
+func (s *backupStruct) Progress(id string) BackupProgress {
+	s.mu.Lock()
+	running := s.running[id]
+	startedAt := s.started[id]
+	s.mu.Unlock()
+
+	if !running {
+		return BackupProgress{}
+	}
+	progress := BackupProgress{Running: true, StartedAt: startedAt.Format(time.RFC3339)}
+	if stats, err := httper.GetGroupStats(backupStatsGroup(id)); err == nil {
+		progress.Stats = &stats
+	}
+	return progress
+}
+
+// notifyBackupResult tells every open UI how a run ended (a failed scheduled backup would otherwise
+// only show up if someone happens to open the backup panel).
+func notifyBackupResult(id, name string, runErr error, took time.Duration) {
+	if MyService == nil {
+		return
+	}
+	status, message := "success", ""
+	if runErr != nil {
+		status, message = "error", runErr.Error()
+	}
+	MyService.Notify().SendNotify("casaos:backup:result", map[string]interface{}{
+		"job_id":   id,
+		"name":     name,
+		"status":   status,
+		"error":    message,
+		"seconds":  int(took.Seconds()),
+		"finished": time.Now().Format(time.RFC3339),
+	})
 }
 
 // RunJobAsync starts a backup job in the background and returns immediately, instead of blocking

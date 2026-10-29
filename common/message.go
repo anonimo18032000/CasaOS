@@ -9,4 +9,5 @@ var EventTypes = []message_bus.EventType{
 	{Name: "casaos:system:utilization", SourceID: SERVICENAME, PropertyTypeList: []message_bus.PropertyType{}},
 	{Name: "casaos:file:recover", SourceID: SERVICENAME, PropertyTypeList: []message_bus.PropertyType{}},
 	{Name: "casaos:file:operate", SourceID: SERVICENAME, PropertyTypeList: []message_bus.PropertyType{}},
+	{Name: "casaos:backup:result", SourceID: SERVICENAME, PropertyTypeList: []message_bus.PropertyType{}},
 }

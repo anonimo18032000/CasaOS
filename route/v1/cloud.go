@@ -99,9 +99,18 @@ func UmountStorage(ctx echo.Context) error {
 // path (not just checking whether rclone still considers it mounted, which doesn't catch a stale
 // connection). Checks run concurrently so one slow/hung remote doesn't delay the others.
 func GetStoragesHealth(ctx echo.Context) error {
-	r, err := service.MyService.Storage().GetStorages()
+	results, err := checkStorages()
 	if err != nil {
 		return ctx.JSON(common_err.SERVICE_ERROR, model.Result{Success: common_err.SERVICE_ERROR, Message: common_err.GetMsg(common_err.SERVICE_ERROR), Data: err.Error()})
+	}
+	recordStorageHealth(results)
+	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS), Data: results})
+}
+
+func checkStorages() ([]StorageHealth, error) {
+	r, err := service.MyService.Storage().GetStorages()
+	if err != nil {
+		return nil, err
 	}
 
 	results := make([]StorageHealth, len(r.MountPoints))
@@ -137,8 +146,7 @@ func GetStoragesHealth(ctx echo.Context) error {
 		}(i, mp)
 	}
 	wg.Wait()
-
-	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS), Data: results})
+	return results, nil
 }
 
 // ReconnectStorage force-unmounts and remounts a storage. Useful when a mount has gone stale

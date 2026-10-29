@@ -167,3 +167,9 @@ func RunBackupJobNow(ctx echo.Context) error {
 	}
 	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: "backup started"})
 }
+
+// GetBackupProgress reports whether a backup job is running and how far along the copy is.
+func GetBackupProgress(ctx echo.Context) error {
+	progress := service.MyService.Backup().Progress(ctx.Param("id"))
+	return ctx.JSON(common_err.SUCCESS, model.Result{Success: common_err.SUCCESS, Message: common_err.GetMsg(common_err.SUCCESS), Data: progress})
+}
